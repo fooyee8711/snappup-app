@@ -101,6 +101,7 @@ app.post('/api/generate-word', async (req, res) => {
     }
   });
 
+async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -121,9 +122,7 @@ app.post('/api/generate-word', async (req, res) => {
   });
 }
 
-// Export the app for Vercel
-export default app;
+startServer();
 
-if (process.env.NODE_ENV !== 'production') {
-  startServer();
-}
+// Export the app for Vercel (though we use api/index.ts now)
+export default app;

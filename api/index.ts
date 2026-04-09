@@ -54,7 +54,9 @@ app.post('/api/generate-word', async (req, res) => {
 
     const apiKey = process.env.CUSTOM_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      return res.status(500).json({ error: 'API key is not configured' });
+      return res.status(500).json({ 
+        error: 'API key is not configured. Please add GEMINI_API_KEY or MINIMAX_API_KEY to your environment variables.' 
+      });
     }
 
     const ai = new GoogleGenAI({ apiKey });
