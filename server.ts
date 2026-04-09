@@ -16,7 +16,7 @@ app.post('/api/generate-word', async (req, res) => {
         return res.status(400).json({ error: 'Word is required' });
       }
 
-      const minimaxKey = process.env.MINIMAX_API_KEY;
+      const minimaxKey = process.env.snapaw;
       const prompt = `Generate educational data for the English word '${word}'. It must be suitable for grades 2-6 (Lexile < 800L). Return ONLY a valid JSON object with the following structure (no markdown, no code blocks, just the JSON):
 {
   "morphology": {
