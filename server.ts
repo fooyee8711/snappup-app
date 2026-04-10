@@ -39,7 +39,7 @@ app.post('/api/generate-word', async (req, res) => {
       const ai = new GoogleGenAI({ apiKey });
 
       const response = await (ai as any).models.generateContent({
-        model: 'gemini-1.5-flash-latest',
+        model: 'gemini-flash-latest',
         contents: prompt,
         config: {
           responseMimeType: "application/json",
