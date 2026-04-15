@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../store/progress';
 import { WordEntry } from '../data/words';
@@ -6,12 +6,100 @@ import { WordEntry } from '../data/words';
 export const ManageWords: React.FC = () => {
   const navigate = useNavigate();
   const { addCustomWord } = useProgress();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [wordsInput, setWordsInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentWord, setCurrentWord] = useState('');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [results, setResults] = useState<{ word: string; status: 'success' | 'error'; message?: string }[]>([]);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLoading(true);
+    setResults([]);
+    
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const rawJson = JSON.parse(event.target?.result as string);
+        let wordsToImport: any[] = [];
+
+        // Handle KET Peppa Pig format
+        if (rawJson.ket_category_analysis) {
+          Object.entries(rawJson.ket_category_analysis).forEach(([category, words]: [string, any]) => {
+            words.forEach((w: any) => {
+              wordsToImport.push({
+                ...w,
+                category: category,
+                isKet: true
+              });
+            });
+          });
+        } else if (Array.isArray(rawJson)) {
+          // Handle NotebookLM format
+          wordsToImport = rawJson;
+        } else {
+          throw new Error('Unsupported JSON format.');
+        }
+
+        setProgress({ current: 0, total: wordsToImport.length });
+
+        for (let i = 0; i < wordsToImport.length; i++) {
+          const item = wordsToImport[i];
+          setProgress(prev => ({ ...prev, current: i + 1 }));
+          
+          if (item.isKet) {
+            const newWord: WordEntry = {
+              id: `ket-${Date.now()}-${i}`,
+              word: item.word.toLowerCase(),
+              morphology: { root: item.word }, // Default root for KET
+              meaning: item.phonics_rules_applied.join(', '),
+              exampleSentence: item.peppa_pig_sentence,
+              story: `In Peppa Pig: "${item.peppa_pig_sentence}"`,
+              relatedWords: [],
+              category: item.category || 'KET Vocabulary',
+              decoratedWord: item.decorated_word,
+              phonicsRules: item.phonics_rules_applied
+            };
+            addCustomWord(newWord);
+            setResults(prev => [...prev, { word: item.word, status: 'success' }]);
+          } else {
+            if (!item.word || !item.morphology || !item.meaning) {
+              setResults(prev => [...prev, { word: item.word || 'Unknown', status: 'error', message: 'Missing required fields' }]);
+              continue;
+            }
+
+            const newWord: WordEntry = {
+              id: `import-${Date.now()}-${i}`,
+              word: item.word.toLowerCase(),
+              morphology: {
+                prefix: item.morphology.prefix || undefined,
+                root: item.morphology.root,
+                suffix: item.morphology.suffix || undefined,
+              },
+              meaning: item.meaning,
+              exampleSentence: item.exampleSentence,
+              story: item.story,
+              relatedWords: [],
+              category: 'Imported'
+            };
+
+            addCustomWord(newWord);
+            setResults(prev => [...prev, { word: item.word, status: 'success' }]);
+          }
+        }
+      } catch (err) {
+        setResults(prev => [...prev, { word: 'File', status: 'error', message: err instanceof Error ? err.message : 'Failed to parse JSON file' }]);
+      } finally {
+        setLoading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+    reader.readAsText(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,7 +216,24 @@ export const ManageWords: React.FC = () => {
               className="w-full p-4 text-xl font-bold text-stone-800 bg-amber-50 border-4 border-amber-100 rounded-2xl focus:outline-none focus:border-amber-400 focus:ring-0 transition-all placeholder:text-amber-300 placeholder:font-medium resize-none" 
               placeholder="Enter words separated by new lines or commas..." 
             />
-            <p className="text-stone-400 text-sm mt-2 font-medium">Tip: You can paste a list of words here.</p>
+            <div className="mt-4 flex items-center gap-4">
+              <p className="text-stone-400 text-sm font-medium">Or import from NotebookLM JSON:</p>
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                onChange={handleFileUpload}
+                accept=".json"
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+                className="px-4 py-2 bg-stone-200 text-stone-700 rounded-xl font-bold hover:bg-stone-300 transition-all disabled:opacity-50"
+              >
+                Upload JSON
+              </button>
+            </div>
           </div>
         </div>
 

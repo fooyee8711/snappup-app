@@ -22,6 +22,8 @@ export interface WordEntry {
   bookSentence?: string;
   childMeaning?: string;
   magicUsage?: string;
+  decoratedWord?: string;
+  phonicsRules?: string[];
 }
 
 export const words: WordEntry[] = [
