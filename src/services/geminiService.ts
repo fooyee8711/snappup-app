@@ -19,11 +19,15 @@ STRICT CURRICULUM MAPPING RULES:
 Return ONLY a JSON object that strictly adheres to the provided schema.`;
 
 export async function generateWordData(word: string) {
-  // Use snapaw as preference if available locally, but GEMINI_API_KEY is the standard
-  const apiKey = process.env.GEMINI_API_KEY || (process.env as any).snapaw;
+  // Check multiple possible environment variables injected by the platform or user
+  const apiKey = 
+    process.env.GEMINI_API_KEY || 
+    (process.env as any).snapaw || 
+    (import.meta as any).env.VITE_GEMINI_API_KEY ||
+    (import.meta as any).env.VITE_SNAPAW;
   
   if (!apiKey) {
-    throw new Error('Gemini API key is not configured. Please add GEMINI_API_KEY in the project Secrets.');
+    throw new Error('Gemini API key is missing. Please ensure GEMINI_API_KEY is enabled in Secrets, or add VITE_GEMINI_API_KEY.');
   }
 
   const ai = new GoogleGenAI({ apiKey });
