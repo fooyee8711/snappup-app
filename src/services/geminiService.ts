@@ -19,11 +19,11 @@ STRICT CURRICULUM MAPPING RULES:
 Return ONLY a JSON object that strictly adheres to the provided schema.`;
 
 export async function generateWordData(word: string) {
-  // Use the exact pattern required by the AI Studio harness
+  // Use the process.env.GEMINI_API_KEY which is defined in vite.config.ts
   const apiKey = process.env.GEMINI_API_KEY;
   
-  if (!apiKey || apiKey === 'undefined') {
-    throw new Error('Star Crystal Missing! In AI Studio Secrets, please add "VITE_GEMINI_API_KEY" as a new Secret.');
+  if (!apiKey || apiKey === 'undefined' || apiKey === '""') {
+    throw new Error('Star Crystal Missing! Please ensure you have a Secret named "snapaw" or "VITE_GEMINI_API_KEY" with your API key value.');
   }
 
   const ai = new GoogleGenAI({ apiKey });
