@@ -32,6 +32,7 @@ export const Settings: React.FC = () => {
     if (selectedModeFilter === 'all') return true;
     if (selectedModeFilter === 'builtin') return !w.id.startsWith('custom-');
     if (selectedModeFilter === 'custom') return w.id.startsWith('custom-');
+    if (selectedModeFilter === 'dictation') return !!w.testDate;
     return true;
   });
 
@@ -71,7 +72,12 @@ export const Settings: React.FC = () => {
           exampleSentence: data.exampleSentence,
           story: data.story,
           relatedWords: [],
-          category: 'Bulk Upload'
+          category: 'Bulk Upload',
+          partOfSpeech: data.partOfSpeech,
+          curriculumCategory: data.curriculumCategory,
+          curriculumSub: data.curriculumSub,
+          decoratedWord: data.decoratedWord,
+          phonicsRules: data.phonicsRules
         };
         addCustomWord(newWord);
         successCount++;
@@ -198,6 +204,7 @@ export const Settings: React.FC = () => {
               <option value="all">All Words</option>
               <option value="builtin">Built-in Words</option>
               <option value="custom">Fancy Tricks (Manual)</option>
+              <option value="dictation">School Dictation</option>
             </select>
           </div>
         </div>
@@ -215,6 +222,8 @@ export const Settings: React.FC = () => {
                   <div className="text-xs text-stone-400 font-medium">
                     {masteredWords.includes(word.id) ? '✅ Mastered' : '⏳ Learning'} 
                     {mistakeCounts[word.id] > 0 && ` • ${mistakeCounts[word.id]} mistakes`}
+                    {word.testDate && ` • 📅 ${word.testDate}`}
+                    {word.partOfSpeech && ` • 🏷️ ${word.partOfSpeech}`}
                   </div>
                 </div>
                 <div className="flex items-center gap-1">

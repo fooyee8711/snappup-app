@@ -16,16 +16,32 @@ app.post('/api/generate-word', async (req, res) => {
         return res.status(400).json({ error: 'Word is required' });
       }
 
-      const prompt = `Generate educational data for the English word '${word}'. It must be suitable for grades 2-6 (Lexile < 800L). Return ONLY a valid JSON object with the following structure (no markdown, no code blocks, just the JSON):
+      const prompt = `Generate educational data for the English word '${word}'. It must be suitable for grades 2-6 (Lexile < 800L). 
+Analyze the word for phonics patterns and morphology.
+
+STRICT CURRICULUM MAPPING RULES:
+1. Check if the word fits into these categories:
+   - 'Prefixes' if it starts with 'un-', 're-', 'pre-', 'dis-', 'mis-', 'in-', 'im-', 'non-', 'over-', 'sub-'.
+   - 'Suffixes' if it ends with '-ly', '-ily', '-ally', '-ful', '-less', '-ness', '-ment', '-able', '-ible'.
+   - 'Exceptions' for words like 'truly', 'duly', 'wholly'.
+   - 'Phonics' for specific spelling rules (e.g., Silent e, Digraphs).
+2. For 'Prefixes', set 'curriculumSub' to: '[prefix] ([meaning])' e.g., 'un- (Not)', 're- (Again)'.
+3. For 'Suffixes', set 'curriculumSub' to:
+   - '-ly (No change)', '-ily (y -> ily)', '-ly (le -> ly)', '-ally (ic/al -> ally)'
+   - '-ful (Full of)', '-less (Without)', '-ness (State)', '-ment (Action)', '-able (Can be)'
+4. Identify the 'partOfSpeech' correctly.
+
+Return ONLY a valid JSON object with the following structure:
 {
-  "morphology": {
-    "prefix": "string (or empty string if none)",
-    "root": "string",
-    "suffix": "string (or empty string if none)"
-  },
-  "meaning": "string (simple definition)",
+  "morphology": { "prefix": "string", "root": "string", "suffix": "string" },
+  "meaning": "string (simple)",
+  "partOfSpeech": "one of: 'noun', 'verb', 'adjective', 'adverb'",
   "exampleSentence": "string",
-  "story": "string (3-4 sentences, engaging, includes the target word 1-3 times)"
+  "story": "string (3-4 sentences)",
+  "curriculumCategory": "One of: 'Prefixes', 'Suffixes', 'Phonics', 'Homophones', 'Exceptions', or null",
+  "curriculumSub": "The specific rule name mentioned above or null",
+  "decoratedWord": "The word with [color]letter[/color] tags (red: short vowels, blue: long, skyblue: vowel teams, orange: digraphs)",
+  "phonicsRules": ["array of strings"]
 }`;
 
       // Use snapaw as the primary API key, fallback to standard Gemini keys

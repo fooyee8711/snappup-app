@@ -14,6 +14,7 @@ interface ProgressContextType {
   resetWord: (id: string) => void;
   deleteWord: (id: string) => void;
   deleteMode: (mode: string) => void;
+  getCurriculumWords: (category: string, sub?: string) => WordEntry[];
   incrementMistake: (id: string) => void;
   setDailyWordCount: (count: number) => void;
   getReviewWords: () => WordEntry[];
@@ -21,6 +22,7 @@ interface ProgressContextType {
   getCustomUnmasteredWords: () => WordEntry[];
   getCustomReviewWords: () => WordEntry[];
   getDailyWords: () => WordEntry[];
+  getWordsByDate: (date: string) => WordEntry[];
   getAllWords: () => WordEntry[];
   addCustomWord: (word: WordEntry) => void;
   dailyCompletedAt: number | null;
@@ -166,6 +168,18 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     });
   };
 
+  const deleteMode = (mode: string) => {
+    if (mode === 'daily') {
+      // For daily, we just clear the mastered words that are in the standard set
+      setMasteredWords(prev => prev.filter(id => !words.find(w => w.id === id)));
+    } else if (mode === 'custom') {
+      // For custom, we delete the custom words themselves
+      const customIds = customWords.map(w => w.id);
+      setCustomWords([]);
+      setMasteredWords(prev => prev.filter(id => !customIds.includes(id)));
+    }
+  };
+
   const incrementMistake = (id: string) => {
     setMistakeCounts(prev => ({
       ...prev,
@@ -241,6 +255,17 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return getAllWords().filter((w) => dailyWords.includes(w.id));
   };
 
+  const getWordsByDate = (date: string) => {
+    return getAllWords().filter(w => w.testDate === date);
+  };
+
+  const getCurriculumWords = (category: string, sub?: string) => {
+    return getAllWords().filter(w => 
+      w.curriculumCategory === category && 
+      (!sub || w.curriculumSub === sub)
+    );
+  };
+
   const addCustomWord = (word: WordEntry) => {
     setCustomWords(prev => [...prev, word]);
   };
@@ -258,6 +283,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       removeMasteredWord, 
       resetWord,
       deleteWord,
+      deleteMode,
+      getCurriculumWords,
       incrementMistake,
       setDailyWordCount,
       getReviewWords, 
@@ -265,6 +292,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       getCustomUnmasteredWords,
       getCustomReviewWords,
       getDailyWords,
+      getWordsByDate,
       getAllWords,
       addCustomWord,
       dailyCompletedAt,

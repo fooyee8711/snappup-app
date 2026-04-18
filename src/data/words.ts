@@ -18,12 +18,16 @@ export interface WordEntry {
   story: string;
   relatedWords: RelatedWord[];
   category: string;
+  curriculumCategory?: 'Prefixes' | 'Suffixes' | 'Phonics' | 'Homophones' | 'Exceptions';
+  curriculumSub?: string;
   level?: string;
   bookSentence?: string;
   childMeaning?: string;
   magicUsage?: string;
   decoratedWord?: string;
   phonicsRules?: string[];
+  testDate?: string; // Format: YYYY-MM-DD
+  partOfSpeech?: 'noun' | 'verb' | 'adjective' | 'adverb' | 'conjunction' | 'preposition' | 'other';
 }
 
 export const words: WordEntry[] = [
@@ -6500,5 +6504,119 @@ export const words: WordEntry[] = [
       { word: "quicken", meaning: "Make or become faster" }
     ],
     category: "Safety"
+  },
+  // --- Category 1: Prefixes ---
+  {
+    id: "pref-3",
+    word: "discolour",
+    morphology: { prefix: "dis", root: "colour", suffix: "" },
+    meaning: "To change color, especially in a bad way.",
+    exampleSentence: "The sun will discolour the plastic.",
+    story: "Oops! The strong sun made the curtains **discolour**. They were red, but now they are a faint pink because they **discolour**-ed so much.",
+    relatedWords: [{ word: "colour", meaning: "red, blue, green, etc." }],
+    category: "Prefixes",
+    curriculumCategory: "Prefixes",
+    curriculumSub: "dis- (Negative)"
+  },
+  {
+    id: "pref-4",
+    word: "discover",
+    morphology: { prefix: "dis", root: "cover", suffix: "" },
+    meaning: "To find something for the first time.",
+    exampleSentence: "I like to discover new paths.",
+    story: "When you **discover** a secret, you 'un-cover' it! Columbus didn't **discover** America, but he certainly tried!",
+    relatedWords: [{ word: "cover", meaning: "to place something over" }],
+    category: "Prefixes",
+    curriculumCategory: "Prefixes",
+    curriculumSub: "dis- (Negative)"
+  },
+  {
+    id: "pref-11",
+    word: "misspell",
+    morphology: { prefix: "mis", root: "spell", suffix: "" },
+    meaning: "To spell a word incorrectly.",
+    exampleSentence: "Be careful not to misspell 'necessary'.",
+    story: "If you **misspell** a word, don't worry! Everyone will **misspell** things sometimes, just fix it with an eraser.",
+    relatedWords: [{ word: "spell", meaning: "to write correctly" }],
+    category: "Prefixes",
+    curriculumCategory: "Prefixes",
+    curriculumSub: "mis- (Negative)"
+  },
+  // --- Category 2: Suffixes ---
+  {
+    id: "suff-2",
+    word: "kindly",
+    morphology: { prefix: "", root: "kind", suffix: "ly" },
+    meaning: "In a kind way.",
+    exampleSentence: "She smiled kindly at the puppy.",
+    story: "The wizard spoke **kindly** to the scared boy. Because he acted **kindly**, the boy felt safe.",
+    relatedWords: [{ word: "kind", meaning: "nice" }],
+    category: "Suffixes",
+    curriculumCategory: "Suffixes",
+    curriculumSub: "-ly (No change)"
+  },
+  {
+    id: "suff-21",
+    word: "gently",
+    morphology: { prefix: "", root: "gentle", suffix: "ly" },
+    meaning: "In a gentle way (remove 'e' then add 'y').",
+    exampleSentence: "Hold the baby bird gently.",
+    story: "You must touch the butterfly **gently**. We replace the 'le' with 'ly' to say how to do it **gently**.",
+    relatedWords: [{ word: "gentle", meaning: "soft/mild" }],
+    category: "Suffixes",
+    curriculumCategory: "Suffixes",
+    curriculumSub: "-ly (le to ly)"
+  },
+  // --- Category 3: Phonics ---
+  {
+    id: "phon-2",
+    word: "woman",
+    morphology: { prefix: "", root: "woman", suffix: "" },
+    meaning: "An adult female human.",
+    exampleSentence: "The woman waved at us.",
+    story: "The 'o' in **woman** makes a short /u/ sound. One **woman** told us to check the spelling carefully!",
+    relatedWords: [],
+    category: "Phonics",
+    curriculumCategory: "Phonics",
+    curriculumSub: "Short /u/ as 'o'",
+    decoratedWord: "w[red]o[/red]man"
+  },
+  {
+    id: "phon-11",
+    word: "myth",
+    morphology: { prefix: "", root: "myth", suffix: "" },
+    meaning: "An ancient story that explains something.",
+    exampleSentence: "The myth of the phoenix is cool.",
+    story: "A **myth** is like a mystery! The 'y' sounds like an 'i'. Is the **myth** true or just a story?",
+    relatedWords: [],
+    category: "Phonics",
+    curriculumCategory: "Phonics",
+    curriculumSub: "Short /i/ as 'y'",
+    decoratedWord: "m[red]y[/red]th"
+  },
+  // --- Category 4: Homophones ---
+  {
+    id: "homo-1",
+    word: "grate",
+    morphology: { prefix: "", root: "grate", suffix: "" },
+    meaning: "To shred something into small pieces (like cheese).",
+    exampleSentence: "Can you grate the cheese for the pizza?",
+    story: "I wanted to **grate** some cheese, but I accidentally hit the fireplace **grate**. Don't **grate** your fingers!",
+    relatedWords: [],
+    category: "Homophones",
+    curriculumCategory: "Homophones",
+    curriculumSub: "Set 1"
+  },
+  {
+    id: "homo-2",
+    word: "great",
+    morphology: { prefix: "", root: "great", suffix: "" },
+    meaning: "Very good or big.",
+    exampleSentence: "You did a great job!",
+    story: "It's **great** to be alive! A **great** warrior once said that helping others is a **great** thing to do.",
+    relatedWords: [],
+    category: "Homophones",
+    curriculumCategory: "Homophones",
+    curriculumSub: "Set 1"
   }
 ];

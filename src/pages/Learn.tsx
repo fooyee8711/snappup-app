@@ -7,9 +7,10 @@ import { BuildWord } from '../components/learn/BuildWord';
 import { StoryContext } from '../components/learn/StoryContext';
 import { Spelling } from '../components/learn/Spelling';
 import { RootExplorer } from '../components/learn/RootExplorer';
+import { Dictation } from '../components/learn/Dictation';
 import { Praise } from '../components/Praise';
 
-type Step = 'target' | 'build' | 'story' | 'spelling' | 'root' | 'praise';
+type Step = 'target' | 'build' | 'story' | 'spelling' | 'root' | 'praise' | 'dictation';
 
 export const Learn: React.FC = () => {
   const navigate = useNavigate();
@@ -19,19 +20,45 @@ export const Learn: React.FC = () => {
   const { 
     addMasteredWords, 
     getDailyWords, 
-    getCustomUnmasteredWords, 
+    getCustomUnmasteredWords,
+    getCurriculumWords,
+    getWordsByDate,
     markDailyComplete, 
-    dailyWordCount
+    dailyWordCount,
+    masteredWords
   } = useProgress();
   
+  const date = searchParams.get('date') || '';
+  const [isTesting, setIsTesting] = useState(false);
+
   let currentSet: WordEntry[] = [];
   if (type === 'custom') {
-    currentSet = getCustomUnmasteredWords().slice(0, dailyWordCount);
+    const filter = searchParams.get('filter');
+    currentSet = getCustomUnmasteredWords();
+    if (filter === 'uncategorized') {
+      currentSet = currentSet.filter(w => !w.curriculumCategory);
+    }
+    currentSet = currentSet.slice(0, dailyWordCount);
+  } else if (type === 'curriculum') {
+    const category = searchParams.get('category') || '';
+    const sub = searchParams.get('sub') || undefined;
+    currentSet = getCurriculumWords(category, sub).slice(0, 10);
+  } else if (type === 'date') {
+    if (isTesting) {
+      currentSet = getWordsByDate(date);
+    } else {
+      currentSet = getWordsByDate(date).filter(w => !masteredWords.includes(w.id));
+    }
   } else {
     currentSet = getDailyWords();
+    const pos = searchParams.get('pos');
+    if (pos) {
+      currentSet = currentSet.filter(w => w.partOfSpeech === pos);
+    }
   }
   
   const [loop, setLoop] = useState(1);
+  const maxLoops = type === 'date' ? 3 : 2;
   const [wordIndex, setWordIndex] = useState(0);
   const [step, setStep] = useState<Step>('target');
   const [showPraise, setShowPraise] = useState(false);
@@ -79,21 +106,36 @@ export const Learn: React.FC = () => {
         setShowPraise(false);
         if (wordIndex < currentSet.length - 1) {
           setWordIndex(wordIndex + 1);
-          setStep('target');
+          setStep(isTesting ? 'dictation' : 'target');
         } else {
-          if (loop === 1) {
-            setLoop(2);
+          if (loop < maxLoops) {
+            setLoop(loop + 1);
             setWordIndex(0);
-            setStep('target');
+            setStep(isTesting ? 'dictation' : 'target');
           } else {
-            // Mastered the set!
+            // Mastered the current learning set
             addMasteredWords(currentSet.map(w => w.id));
             if (type === 'daily') {
               markDailyComplete();
             }
-            navigate('/');
+            
+            if (type === 'date' && !isTesting) {
+              // Transition to Dictation Test for ALL words of this date
+              setIsTesting(true);
+              setLoop(1);
+              setWordIndex(0);
+              setStep('dictation');
+            } else if (type === 'curriculum') {
+              navigate('/curriculum');
+            } else {
+              navigate('/');
+            }
           }
         }
+        break;
+      case 'dictation':
+        setShowPraise(true);
+        setStep('praise');
         break;
     }
   };
@@ -103,7 +145,7 @@ export const Learn: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col pt-12 pb-6">
       <div className="flex justify-between items-center mb-8 text-stone-400 text-base font-bold uppercase tracking-wider">
-        <span>Loop {loop}/2</span>
+        <span>{isTesting ? '🏆 Test Phase' : `Loop ${loop}/${maxLoops}`}</span>
         <span>Word {wordIndex + 1}/{currentSet.length}</span>
       </div>
 
@@ -113,6 +155,7 @@ export const Learn: React.FC = () => {
         {step === 'story' && <StoryContext word={currentWord} onNext={nextStep} />}
         {step === 'spelling' && <Spelling word={currentWord} onNext={nextStep} />}
         {step === 'root' && <RootExplorer word={currentWord} onNext={nextStep} />}
+        {step === 'dictation' && <Dictation word={currentWord} onNext={nextStep} />}
         {step === 'praise' && <Praise onNext={nextStep} />}
       </div>
     </div>

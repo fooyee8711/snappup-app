@@ -2,6 +2,7 @@ import React from 'react';
 import { WordEntry } from '../../data/words';
 import { Volume2 } from 'lucide-react';
 import { PhonicsWord } from './PhonicsWord';
+import clsx from 'clsx';
 
 interface Props {
   word: WordEntry;
@@ -20,6 +21,17 @@ export const TargetWord: React.FC<Props> = ({ word, onNext }) => {
       <div className="text-center space-y-6">
         <h2 className="text-5xl font-bold tracking-tight flex flex-col justify-center items-center gap-4">
           <div className="flex items-center gap-4">
+            {word.partOfSpeech && (
+              <span className={clsx(
+                "text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-tighter",
+                word.partOfSpeech === 'noun' && "bg-emerald-100 text-emerald-700",
+                word.partOfSpeech === 'verb' && "bg-rose-100 text-rose-700",
+                word.partOfSpeech === 'adjective' && "bg-sky-100 text-sky-700",
+                word.partOfSpeech === 'adverb' && "bg-purple-100 text-purple-700"
+              )}>
+                {word.partOfSpeech}
+              </span>
+            )}
             {word.level && (
               <span className="text-sm font-black bg-amber-100 text-amber-600 px-3 py-1 rounded-full uppercase tracking-wider">
                 {word.level}

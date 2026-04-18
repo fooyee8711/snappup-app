@@ -9,6 +9,7 @@ export const ManageWords: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [wordsInput, setWordsInput] = useState('');
+  const [testDate, setTestDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentWord, setCurrentWord] = useState('');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
@@ -161,11 +162,26 @@ export const ManageWords: React.FC = () => {
             exampleSentence: data.exampleSentence,
             story: data.story,
             relatedWords: [],
-            category: 'Custom Practice'
+            category: 'Custom Practice',
+            testDate: testDate || undefined,
+            partOfSpeech: data.partOfSpeech,
+            curriculumCategory: data.curriculumCategory,
+            curriculumSub: data.curriculumSub,
+            decoratedWord: data.decoratedWord,
+            phonicsRules: data.phonicsRules
           };
 
           addCustomWord(newWord);
-          setResults(prev => [...prev, { word: targetWord, status: 'success' }]);
+          const categorization = [
+            data.curriculumCategory ? `Expert [${data.curriculumCategory}]` : null,
+            data.partOfSpeech ? `POS [${data.partOfSpeech}]` : null
+          ].filter(Boolean).join(' • ');
+
+          setResults(prev => [...prev, { 
+            word: targetWord, 
+            status: 'success',
+            message: categorization || 'Generic Practice'
+          }]);
           success = true;
         } catch (err) {
           if (attempts >= maxAttempts - 1 || success) {
@@ -206,6 +222,15 @@ export const ManageWords: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-8 rounded-[2rem] shadow-sm border-2 border-amber-100">
         <div className="space-y-4">
           <div>
+            <label className="block text-lg font-bold text-stone-700 mb-2">School Test Date (Optional)</label>
+            <input 
+              type="date"
+              value={testDate}
+              onChange={e => setTestDate(e.target.value)}
+              disabled={loading}
+              className="w-full p-4 text-xl font-bold text-stone-800 bg-amber-50 border-4 border-amber-100 rounded-2xl focus:outline-none focus:border-amber-400 focus:ring-0 transition-all mb-4"
+            />
+
             <label className="block text-lg font-bold text-stone-700 mb-2">Target Words *</label>
             <textarea 
               required 
@@ -273,7 +298,14 @@ export const ManageWords: React.FC = () => {
                     res.status === 'success' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'
                   }`}
                 >
-                  <span className="font-bold text-stone-700">{res.word}</span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-stone-700">{res.word}</span>
+                    {res.status === 'success' && res.message && (
+                      <span className="text-[10px] font-black text-amber-500 uppercase tracking-tighter">
+                        {res.message}
+                      </span>
+                    )}
+                  </div>
                   {res.status === 'success' ? (
                     <span className="text-emerald-600 text-xs font-black uppercase">Added</span>
                   ) : (
@@ -302,13 +334,6 @@ export const ManageWords: React.FC = () => {
           )}
         </button>
       </form>
-
-      <button
-        onClick={() => navigate('/')}
-        className="mt-6 w-full py-4 bg-stone-100 text-stone-600 rounded-2xl text-xl font-bold hover:bg-stone-200 transition-all active:scale-95 shadow-sm"
-      >
-        Done & Go Back
-      </button>
     </div>
   );
 };
