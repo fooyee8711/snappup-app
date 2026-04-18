@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../store/progress';
 import { WordEntry } from '../data/words';
+import { generateWordData } from '../services/geminiService';
 
 export const ManageWords: React.FC = () => {
   const navigate = useNavigate();
@@ -126,29 +127,7 @@ export const ManageWords: React.FC = () => {
 
       while (attempts < maxAttempts && !success) {
         try {
-          const response = await fetch('/api/generate-word', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ word: targetWord })
-          });
-
-          if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            const errorMsg = errData.error || 'Failed to generate word';
-            
-            // If it's a temporary error (503 or 429), wait and retry
-            if (response.status === 503 || response.status === 429 || errorMsg.toLowerCase().includes('quota') || errorMsg.toLowerCase().includes('demand')) {
-              attempts++;
-              if (attempts < maxAttempts) {
-                setCurrentWord(`${targetWord} (Retry ${attempts}/${maxAttempts-1}...)`);
-                await new Promise(resolve => setTimeout(resolve, 10000)); // Wait 10s for retry
-                continue;
-              }
-            }
-            throw new Error(errorMsg);
-          }
-
-          const data = await response.json();
+          const data = await generateWordData(targetWord);
 
           const newWord: WordEntry = {
             id: `custom-${Date.now()}-${i}`,
