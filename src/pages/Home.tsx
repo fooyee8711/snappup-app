@@ -28,7 +28,7 @@ export const Home: React.FC = () => {
   const hoursLeft = Math.ceil((cooldownMs - timeSinceComplete) / (60 * 60 * 1000));
 
   const standardReview = getStandardReviewWords();
-  const customUnmastered = getCustomUnmasteredWords().filter(w => !w.curriculumCategory);
+  const customUnmastered = getCustomUnmasteredWords().filter(w => !w.curriculumCategory && !w.testDate);
   const customReview = getCustomReviewWords();
   
   const [posFilter, setPosFilter] = React.useState<string>('all');

@@ -54,17 +54,19 @@ export const ManageWords: React.FC = () => {
           setProgress(prev => ({ ...prev, current: i + 1 }));
           
           if (item.isKet) {
+            // ... (keep KET logic if needed, or unify) - staying consistent with existing
             const newWord: WordEntry = {
               id: `ket-${Date.now()}-${i}`,
               word: item.word.toLowerCase(),
-              morphology: { root: item.word }, // Default root for KET
+              morphology: { root: item.word },
               meaning: item.phonics_rules_applied.join(', '),
               exampleSentence: item.peppa_pig_sentence,
               story: `In Peppa Pig: "${item.peppa_pig_sentence}"`,
               relatedWords: [],
               category: item.category || 'KET Vocabulary',
               decoratedWord: item.decorated_word,
-              phonicsRules: item.phonics_rules_applied
+              phonicsRules: item.phonics_rules_applied,
+              testDate: testDate || undefined
             };
             addCustomWord(newWord);
             setResults(prev => [...prev, { word: item.word, status: 'success' }]);
@@ -86,7 +88,13 @@ export const ManageWords: React.FC = () => {
               exampleSentence: item.exampleSentence,
               story: item.story,
               relatedWords: [],
-              category: 'Imported'
+              category: item.category || 'Imported',
+              testDate: item.testDate || testDate || undefined,
+              partOfSpeech: item.partOfSpeech,
+              curriculumCategory: item.curriculumCategory,
+              curriculumSub: item.curriculumSub,
+              decoratedWord: item.decoratedWord,
+              phonicsRules: item.phonicsRules || []
             };
 
             addCustomWord(newWord);
