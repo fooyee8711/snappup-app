@@ -13,10 +13,12 @@ export const Home: React.FC = () => {
     getCustomUnmasteredWords,
     getCustomReviewWords,
     getAllWords,
-    getWordsByDate
+    getWordsByDate,
+    lastSession
   } = useProgress();
 
   const allWords = getAllWords();
+  const lastWord = lastSession ? allWords.find(w => w.id === lastSession.wordId) : null;
   const dictationDates = Array.from(new Set(allWords.map(w => w.testDate).filter(Boolean))) as string[];
   dictationDates.sort();
 
@@ -55,6 +57,24 @@ export const Home: React.FC = () => {
       </div>
 
       <div className="w-full space-y-6">
+        {/* Resume Session Card */}
+        {lastSession && lastWord && (
+          <div className="bg-amber-600 p-6 rounded-[2rem] shadow-lg border-2 border-amber-500 space-y-4 transform hover:scale-[1.02] transition-all">
+            <h2 className="text-2xl font-black text-white flex items-center gap-2">
+              <span className="animate-pulse">🦴</span> Resume Training?
+            </h2>
+            <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-sm">
+              <p className="text-amber-100 text-sm font-bold uppercase tracking-wider mb-1">Last Word Studied:</p>
+              <p className="text-white text-3xl font-black">{lastWord.word}</p>
+            </div>
+            <button
+              onClick={() => navigate(lastSession.path)}
+              className="w-full py-4 bg-white text-amber-600 rounded-2xl text-xl font-black hover:bg-amber-50 transition-all active:scale-95 shadow-md"
+            >
+              Pick Up the Scent
+            </button>
+          </div>
+        )}
         {/* School Dictation Section */}
         {dictationDates.length > 0 && (
           <div className="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-indigo-100 space-y-4">

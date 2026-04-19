@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { words, WordEntry } from '../data/words';
 import { useProgress } from '../store/progress';
 import { TargetWord } from '../components/learn/TargetWord';
@@ -14,6 +14,7 @@ type Step = 'target' | 'build' | 'story' | 'spelling' | 'root' | 'praise' | 'dic
 
 export const Learn: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const type = searchParams.get('type') || 'daily';
   
@@ -25,7 +26,10 @@ export const Learn: React.FC = () => {
     getWordsByDate,
     markDailyComplete, 
     dailyWordCount,
-    masteredWords
+    masteredWords,
+    lastSession,
+    updateLastSession,
+    clearLastSession
   } = useProgress();
   
   const date = searchParams.get('date') || '';
@@ -62,6 +66,26 @@ export const Learn: React.FC = () => {
   const [wordIndex, setWordIndex] = useState(0);
   const [step, setStep] = useState<Step>('target');
   const [showPraise, setShowPraise] = useState(false);
+
+  // Resume Session logic
+  useEffect(() => {
+    if (lastSession && lastSession.path === location.pathname + location.search && currentSet.length > 0) {
+      const savedIndex = currentSet.findIndex(w => w.id === lastSession.wordId);
+      if (savedIndex !== -1) {
+        setWordIndex(savedIndex);
+      }
+    }
+  }, []);
+
+  // Update session on word change
+  const currentWordId = currentSet[wordIndex]?.id;
+  const sessionPath = location.pathname + location.search;
+
+  useEffect(() => {
+    if (currentWordId) {
+      updateLastSession(sessionPath, currentWordId);
+    }
+  }, [wordIndex, currentWordId, sessionPath, updateLastSession]);
 
   if (currentSet.length === 0) {
     return (
@@ -115,6 +139,7 @@ export const Learn: React.FC = () => {
           } else {
             // Mastered the current learning set
             addMasteredWords(currentSet.map(w => w.id));
+            clearLastSession();
             if (type === 'daily') {
               markDailyComplete();
             }

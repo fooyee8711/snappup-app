@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Stores user settings and progress data.",
+      "type": "object",
+      "properties": {
+        "dailyWordCount": { "type": "number" },
+        "dailyCompletedAt": { "type": "number" },
+        "masteredWords": { "type": "array", "items": { "type": "string" } },
+        "mistakeCounts": { "type": "object" },
+        "dailyStats": { "type": "object" },
+        "dailyWords": { "type": "array", "items": { "type": "string" } },
+        "dailyDate": { "type": "string" },
+        "lastSession": {
+          "type": "object",
+          "properties": {
+            "path": { "type": "string" },
+            "wordId": { "type": "string" },
+            "timestamp": { "type": "number" }
+          }
+        }
+      }
+    },
+    "CustomWord": {
+      "title": "Custom Word",
+      "description": "Details of a word added by the user.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "word": { "type": "string" },
+        "meaning": { "type": "string" },
+        "morphology": {
+          "type": "object",
+          "properties": {
+            "prefix": { "type": "string" },
+            "root": { "type": "string" },
+            "suffix": { "type": "string" }
+          }
+        },
+        "exampleSentence": { "type": "string" },
+        "story": { "type": "string" },
+        "relatedWords": { "type": "array", "items": { "type": "string" } },
+        "category": { "type": "string" },
+        "partOfSpeech": { "type": "string" },
+        "curriculumCategory": { "type": "string" },
+        "curriculumSub": { "type": "string" },
+        "decoratedWord": { "type": "string" },
+        "phonicsRules": { "type": "array", "items": { "type": "string" } },
+        "testDate": { "type": "string" }
+      },
+      "required": ["word", "meaning"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with global settings and mastered IDs."
+    },
+    "/users/{userId}/custom_words/{wordId}": {
+      "schema": "CustomWord",
+      "description": "Collection of user-added dictionary words."
+    }
+  }
+}

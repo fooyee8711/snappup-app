@@ -1,12 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../store/progress';
 import { WordEntry } from '../data/words';
 import { generateWordData } from '../services/geminiService';
+import { Trash2, CheckCircle, Circle, Search } from 'lucide-react';
+import clsx from 'clsx';
 
 export const ManageWords: React.FC = () => {
   const navigate = useNavigate();
-  const { addCustomWord } = useProgress();
+  const { 
+    addCustomWord, 
+    customWords, 
+    masteredWords, 
+    addMasteredWord, 
+    removeMasteredWord, 
+    deleteWord 
+  } = useProgress();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [wordsInput, setWordsInput] = useState('');
@@ -15,6 +24,15 @@ export const ManageWords: React.FC = () => {
   const [currentWord, setCurrentWord] = useState('');
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [results, setResults] = useState<{ word: string; status: 'success' | 'error'; message?: string }[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredWords = useMemo(() => {
+    if (!searchTerm) return customWords;
+    return customWords.filter(w => 
+      w.word.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      w.meaning.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [customWords, searchTerm]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -321,6 +339,82 @@ export const ManageWords: React.FC = () => {
           )}
         </button>
       </form>
+
+      {/* Word Management Section */}
+      <div className="mt-12 space-y-6">
+        <div className="flex justify-between items-center px-4">
+          <h3 className="text-2xl font-black text-stone-800">Existing Words</h3>
+          <span className="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-sm font-bold">
+            {customWords.length} Total
+          </span>
+        </div>
+
+        <div className="relative group p-4">
+          <Search className="absolute left-8 top-1/2 -translate-y-1/2 text-stone-400" size={20} />
+          <input 
+            type="text"
+            placeholder="Search your words..."
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 bg-white border-2 border-stone-100 rounded-2xl focus:border-amber-400 outline-none transition-all shadow-sm"
+          />
+        </div>
+
+        <div className="space-y-3 px-1">
+          {filteredWords.map((word) => {
+            const isMastered = masteredWords.includes(word.id);
+            return (
+              <div 
+                key={word.id}
+                className="bg-white p-4 rounded-3xl border-2 border-stone-50 shadow-sm flex items-center justify-between group"
+              >
+                <div className="flex-1 min-w-0 pr-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-black text-lg text-stone-800 truncate">{word.word}</span>
+                    {word.testDate && (
+                      <span className="bg-indigo-50 text-indigo-600 text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                        {word.testDate}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-stone-500 text-sm line-clamp-1">{word.meaning}</p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => isMastered ? removeMasteredWord(word.id) : addMasteredWord(word.id)}
+                    className={clsx(
+                      "p-3 rounded-2xl transition-all active:scale-90",
+                      isMastered ? "bg-emerald-100 text-emerald-600" : "bg-stone-50 text-stone-300 hover:text-stone-400"
+                    )}
+                    aria-label={isMastered ? "Mark as unlearned" : "Mark as learned"}
+                  >
+                    {isMastered ? <CheckCircle size={24} strokeWidth={2.5} /> : <Circle size={24} strokeWidth={2.5} />}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (confirm(`Forget "${word.word}" forever?`)) {
+                        deleteWord(word.id);
+                      }
+                    }}
+                    className="p-3 bg-red-50 text-red-400 rounded-2xl hover:text-red-600 transition-all active:scale-90"
+                    aria-label="Delete word"
+                  >
+                    <Trash2 size={24} strokeWidth={2.5} />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+
+          {filteredWords.length === 0 && (
+            <div className="text-center py-12 text-stone-400 bg-white/50 rounded-[2rem] border-2 border-dashed border-stone-100">
+              <p className="font-bold">No words found.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

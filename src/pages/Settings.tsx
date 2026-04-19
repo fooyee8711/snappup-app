@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useProgress } from '../store/progress';
 import { WordEntry } from '../data/words';
-import { Settings as SettingsIcon, Upload, RotateCcw, BarChart3, Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Settings as SettingsIcon, Upload, RotateCcw, BarChart3, Trash2, CheckCircle2, AlertCircle, Circle, CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
 import { generateWordData } from '../services/geminiService';
 
@@ -15,7 +15,9 @@ export const Settings: React.FC = () => {
     mistakeCounts,
     resetWord,
     deleteWord,
-    addCustomWord
+    addCustomWord,
+    addMasteredWord,
+    removeMasteredWord
   } = useProgress();
 
   const [bulkInput, setBulkInput] = useState('');
@@ -208,61 +210,75 @@ export const Settings: React.FC = () => {
               No words found in this category.
             </div>
           ) : (
-            sortedWords.map(word => (
-              <div key={word.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100 group">
-                <div>
-                  <div className="font-bold text-stone-800">{word.word}</div>
-                  <div className="text-xs text-stone-400 font-medium">
-                    {masteredWords.includes(word.id) ? '✅ Mastered' : '⏳ Learning'} 
-                    {mistakeCounts[word.id] > 0 && ` • ${mistakeCounts[word.id]} mistakes`}
-                    {word.testDate && ` • 📅 ${word.testDate}`}
-                    {word.partOfSpeech && ` • 🏷️ ${word.partOfSpeech}`}
+            sortedWords.map(word => {
+              const isMastered = masteredWords.includes(word.id);
+              return (
+                <div key={word.id} className="flex items-center justify-between p-3 bg-stone-50 rounded-xl border border-stone-100 group">
+                  <div className="flex-1 min-w-0 pr-2">
+                    <div className="font-bold text-stone-800 truncate">{word.word}</div>
+                    <div className="text-[10px] text-stone-400 font-medium uppercase tracking-tight">
+                      {isMastered ? '✅ Mastered' : '⏳ Learning'} 
+                      {mistakeCounts[word.id] > 0 && ` • ${mistakeCounts[word.id]} mistakes`}
+                      {word.testDate && ` • 📅 ${word.testDate}`}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => isMastered ? removeMasteredWord(word.id) : addMasteredWord(word.id)}
+                      className={clsx(
+                        "p-2 rounded-lg transition-all active:scale-90",
+                        isMastered ? "text-emerald-500 bg-emerald-50" : "text-stone-300 bg-white"
+                      )}
+                      aria-label="Toggle mastery"
+                    >
+                      {isMastered ? <CheckCircle size={20} /> : <Circle size={20} />}
+                    </button>
+
+                    {isMastered && (
+                      <button 
+                        onClick={() => resetWord(word.id)}
+                        className="p-2 text-stone-400 hover:text-orange-500 hover:bg-orange-50 bg-white rounded-lg transition-all"
+                        title="Relearn this word"
+                      >
+                        <RotateCcw size={18} />
+                      </button>
+                    )}
+
+                    {word.id.startsWith('custom-') && (
+                      <div className="flex items-center">
+                        {wordToDelete === word.id ? (
+                          <div className="flex items-center gap-1 animate-in fade-in slide-in-from-right-2 duration-200">
+                            <button 
+                              onClick={() => {
+                                deleteWord(word.id);
+                                setWordToDelete(null);
+                              }}
+                              className="px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded-md hover:bg-red-600"
+                            >
+                              Yes
+                            </button>
+                            <button 
+                              onClick={() => setWordToDelete(null)}
+                              className="px-2 py-1 bg-stone-200 text-stone-600 text-[10px] font-bold rounded-md hover:bg-stone-300"
+                            >
+                              No
+                            </button>
+                          </div>
+                        ) : (
+                          <button 
+                            onClick={() => setWordToDelete(word.id)}
+                            className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 bg-white rounded-lg transition-all sm:opacity-0 sm:group-hover:opacity-100"
+                            title="Delete word"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  {masteredWords.includes(word.id) && (
-                    <button 
-                      onClick={() => resetWord(word.id)}
-                      className="p-2 text-stone-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all"
-                      title="Relearn this word"
-                    >
-                      <RotateCcw size={18} />
-                    </button>
-                  )}
-                  {(word.id.startsWith('custom-')) && (
-                    <div className="flex items-center">
-                      {wordToDelete === word.id ? (
-                        <div className="flex items-center gap-1 animate-in fade-in slide-in-from-right-2 duration-200">
-                          <button 
-                            onClick={() => {
-                              deleteWord(word.id);
-                              setWordToDelete(null);
-                            }}
-                            className="px-2 py-1 bg-red-500 text-white text-[10px] font-bold rounded-md hover:bg-red-600"
-                          >
-                            Yes
-                          </button>
-                          <button 
-                            onClick={() => setWordToDelete(null)}
-                            className="px-2 py-1 bg-stone-200 text-stone-600 text-[10px] font-bold rounded-md hover:bg-stone-300"
-                          >
-                            No
-                          </button>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={() => setWordToDelete(word.id)}
-                          className="p-2 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                          title="Delete word"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </section>
