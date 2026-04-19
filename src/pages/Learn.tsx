@@ -8,9 +8,10 @@ import { StoryContext } from '../components/learn/StoryContext';
 import { Spelling } from '../components/learn/Spelling';
 import { RootExplorer } from '../components/learn/RootExplorer';
 import { Dictation } from '../components/learn/Dictation';
+import { FillInBlanks } from '../components/learn/FillInBlanks';
 import { Praise } from '../components/Praise';
 
-type Step = 'target' | 'build' | 'story' | 'spelling' | 'root' | 'praise' | 'dictation';
+type Step = 'target' | 'build' | 'story' | 'spelling' | 'root' | 'praise' | 'dictation' | 'fill';
 
 export const Learn: React.FC = () => {
   const navigate = useNavigate();
@@ -33,7 +34,8 @@ export const Learn: React.FC = () => {
   } = useProgress();
   
   const date = searchParams.get('date') || '';
-  const [isTesting, setIsTesting] = useState(false);
+  const mode = searchParams.get('mode') || '';
+  const [isTesting, setIsTesting] = useState(mode === 'review');
 
   let currentSet: WordEntry[] = [];
   if (type === 'custom') {
@@ -48,7 +50,9 @@ export const Learn: React.FC = () => {
     const sub = searchParams.get('sub') || undefined;
     currentSet = getCurriculumWords(category, sub).slice(0, 10);
   } else if (type === 'date') {
-    if (isTesting) {
+    if (mode === 'review') {
+      currentSet = getWordsByDate(date).filter(w => masteredWords.includes(w.id));
+    } else if (isTesting) {
       currentSet = getWordsByDate(date);
     } else {
       currentSet = getWordsByDate(date).filter(w => !masteredWords.includes(w.id));
@@ -62,9 +66,9 @@ export const Learn: React.FC = () => {
   }
   
   const [loop, setLoop] = useState(1);
-  const maxLoops = type === 'date' ? 3 : 2;
+  const maxLoops = mode === 'review' ? 1 : (type === 'date' ? 3 : 2);
   const [wordIndex, setWordIndex] = useState(0);
-  const [step, setStep] = useState<Step>('target');
+  const [step, setStep] = useState<Step>(mode === 'review' ? 'fill' : 'target');
   const [showPraise, setShowPraise] = useState(false);
 
   // Resume Session logic
@@ -130,12 +134,20 @@ export const Learn: React.FC = () => {
         setShowPraise(false);
         if (wordIndex < currentSet.length - 1) {
           setWordIndex(wordIndex + 1);
-          setStep(isTesting ? 'dictation' : 'target');
+          if (mode === 'review') {
+            setStep('fill');
+          } else {
+            setStep(isTesting ? 'dictation' : 'target');
+          }
         } else {
           if (loop < maxLoops) {
             setLoop(loop + 1);
             setWordIndex(0);
-            setStep(isTesting ? 'dictation' : 'target');
+            if (mode === 'review') {
+              setStep('fill');
+            } else {
+              setStep(isTesting ? 'dictation' : 'target');
+            }
           } else {
             // Mastered the current learning set
             addMasteredWords(currentSet.map(w => w.id));
@@ -144,7 +156,7 @@ export const Learn: React.FC = () => {
               markDailyComplete();
             }
             
-            if (type === 'date' && !isTesting) {
+            if (type === 'date' && !isTesting && mode !== 'review') {
               // Transition to Dictation Test for ALL words of this date
               setIsTesting(true);
               setLoop(1);
@@ -161,6 +173,9 @@ export const Learn: React.FC = () => {
       case 'dictation':
         setShowPraise(true);
         setStep('praise');
+        break;
+      case 'fill':
+        setStep('dictation');
         break;
     }
   };
@@ -181,6 +196,7 @@ export const Learn: React.FC = () => {
         {step === 'spelling' && <Spelling word={currentWord} onNext={nextStep} />}
         {step === 'root' && <RootExplorer word={currentWord} onNext={nextStep} />}
         {step === 'dictation' && <Dictation word={currentWord} onNext={nextStep} />}
+        {step === 'fill' && <FillInBlanks word={currentWord} onNext={nextStep} />}
         {step === 'praise' && <Praise onNext={nextStep} />}
       </div>
     </div>

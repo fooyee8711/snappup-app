@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../store/progress';
 import clsx from 'clsx';
+import { CheckCircle } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -86,22 +87,32 @@ export const Home: React.FC = () => {
                 const progressPercent = (masteredForDate / wordsForDate.length) * 100;
 
                 return (
-                  <button
-                    key={date}
-                    onClick={() => navigate(`/learn?type=date&date=${date}`)}
-                    className="w-full text-left p-4 bg-indigo-50 border-2 border-indigo-100 rounded-2xl hover:border-indigo-400 hover:shadow-md transition-all active:scale-[0.98] group"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-black text-indigo-700 text-lg">{date}</span>
-                      <span className="font-bold text-indigo-400">{masteredForDate}/{wordsForDate.length}</span>
-                    </div>
-                    <div className="w-full bg-indigo-100 h-2 rounded-full overflow-hidden">
-                      <div 
-                        className="bg-indigo-500 h-full transition-all duration-500" 
-                        style={{ width: `${progressPercent}%` }}
-                      />
-                    </div>
-                  </button>
+                  <div key={date} className="relative group">
+                    <button
+                      onClick={() => navigate(`/learn?type=date&date=${date}`)}
+                      className="w-full text-left p-4 bg-indigo-50 border-2 border-indigo-100 rounded-2xl hover:border-indigo-400 hover:shadow-md transition-all active:scale-[0.98]"
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-black text-indigo-700 text-lg">{date}</span>
+                        <span className="font-bold text-indigo-400">{masteredForDate}/{wordsForDate.length}</span>
+                      </div>
+                      <div className="w-full bg-indigo-100 h-2 rounded-full overflow-hidden">
+                        <div 
+                          className="bg-indigo-500 h-full transition-all duration-500" 
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </button>
+                    
+                    {masteredForDate > 0 && (
+                      <button
+                        onClick={() => navigate(`/learn?type=date&date=${date}&mode=review`)}
+                        className="mt-2 w-full py-3 bg-white text-indigo-600 border-2 border-indigo-100 rounded-xl text-sm font-black hover:bg-indigo-50 hover:border-indigo-400 transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
+                      >
+                        <CheckCircle size={16} /> Review Mastered (Dictation & Fill)
+                      </button>
+                    )}
+                  </div>
                 );
               })}
             </div>
