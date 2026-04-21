@@ -8,7 +8,17 @@ export default defineConfig(({mode}) => {
   return {
     plugins: [react(), tailwindcss()],
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || env.VITE_GEMINI_API_KEY || env.snapaw || env.VITE_SNAPAW),
+      'process.env.GEMINI_API_KEY': JSON.stringify(
+        process.env.GEMINI_API_KEY || 
+        env.GEMINI_API_KEY || 
+        process.env.VITE_GEMINI_API_KEY || 
+        env.VITE_GEMINI_API_KEY || 
+        process.env.snapaw || 
+        env.snapaw || 
+        process.env.VITE_SNAPAW || 
+        env.VITE_SNAPAW || 
+        "undefined"
+      ),
     },
     resolve: {
       alias: {
