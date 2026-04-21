@@ -6,6 +6,7 @@ export interface RuleSub {
 
 export interface RuleCategory {
   id: string;
+  isSpecial?: boolean;
   title: string;
   description: string;
   icon: string; // Icon name from lucide-react
@@ -18,7 +19,7 @@ export interface RuleCategory {
 export const CURRICULUM_RULES: RuleCategory[] = [
   {
     id: 'Prefixes',
-    title: 'Prefixes (詞首)',
+    title: 'Prefixes',
     description: 'Learn how to change meanings by adding bits to the beginning.',
     icon: 'Layers',
     color: 'bg-blue-500',
@@ -38,7 +39,7 @@ export const CURRICULUM_RULES: RuleCategory[] = [
   },
   {
     id: 'Suffixes',
-    title: 'Suffixes & Adverbs (詞尾與副詞)',
+    title: 'Suffixes & Adverbs',
     description: 'Master how to transform words and change their roles.',
     icon: 'Type',
     color: 'bg-pink-500',
@@ -58,7 +59,7 @@ export const CURRICULUM_RULES: RuleCategory[] = [
   },
   {
     id: 'Phonics',
-    title: 'Phonics & Spelling (發音與拼寫)',
+    title: 'Phonics & Spelling',
     description: 'Crack the code of tricky English spelling patterns.',
     icon: 'Music',
     color: 'bg-purple-500',
@@ -78,7 +79,7 @@ export const CURRICULUM_RULES: RuleCategory[] = [
   },
   {
     id: 'Homophones',
-    title: 'Homophones (同音異義詞)',
+    title: 'Homophones',
     description: 'Identify words that sound twin-like but have different lives.',
     icon: 'Shuffle',
     color: 'bg-amber-500',
@@ -89,5 +90,49 @@ export const CURRICULUM_RULES: RuleCategory[] = [
       { name: "Set 2 (Advanced)", description: "Trickier pairs.", example: "flour/flower, knight/night" },
       { name: "Set 3 (Master)", description: "Elite level pairs.", example: "stationary/stationery" }
     ]
+  },
+  {
+    id: 'Cool',
+    isSpecial: true,
+    title: 'Cool Words',
+    description: 'Impressive words that sound powerful or look unique.',
+    icon: 'Sparkles',
+    color: 'bg-indigo-500',
+    lightColor: 'bg-indigo-50',
+    borderColor: 'border-indigo-100',
+    rules: []
+  },
+  {
+    id: 'Tricky',
+    isSpecial: true,
+    title: 'Non-Phonetic Words',
+    description: 'Words that break the rules and don\'t sound like they look.',
+    icon: 'Ghost',
+    color: 'bg-rose-500',
+    lightColor: 'bg-rose-50',
+    borderColor: 'border-rose-100',
+    rules: []
+  },
+  {
+    id: 'Difficulty',
+    isSpecial: true,
+    title: 'Difficulty Words',
+    description: 'Master the toughest spelling hurdles in the English language.',
+    icon: 'Flame',
+    color: 'bg-orange-500',
+    lightColor: 'bg-orange-50',
+    borderColor: 'border-orange-100',
+    rules: []
+  },
+  {
+    id: 'Nouns',
+    isSpecial: true,
+    title: 'Noun Collector',
+    description: 'Build your vocabulary category by category.',
+    icon: 'Package',
+    color: 'bg-emerald-500',
+    lightColor: 'bg-emerald-50',
+    borderColor: 'border-emerald-100',
+    rules: []
   }
 ];

@@ -16,12 +16,12 @@ export const CurriculumMap: React.FC = () => {
       <div className="flex items-center gap-4">
         <div>
           <h1 className="text-3xl font-black text-stone-800 tracking-tight">Expert Training</h1>
-          <p className="text-stone-500 font-bold">Master the rules of the Warrior Clan</p>
+          <p className="text-stone-500 font-bold">Master the core rules of phonics & grammar</p>
         </div>
       </div>
 
       <div className="grid gap-6">
-        {CURRICULUM_RULES.map((cat, idx) => {
+        {CURRICULUM_RULES.filter(c => !c.isSpecial).map((cat, idx) => {
           const Icon = (Icons as any)[cat.icon] || Icons.Layers;
           return (
             <motion.div

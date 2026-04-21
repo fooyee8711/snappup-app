@@ -40,9 +40,13 @@ export const Learn: React.FC = () => {
   let currentSet: WordEntry[] = [];
   if (type === 'custom') {
     const filter = searchParams.get('filter');
+    const pos = searchParams.get('pos');
     currentSet = getCustomUnmasteredWords();
     if (filter === 'uncategorized') {
       currentSet = currentSet.filter(w => !w.curriculumCategory);
+    }
+    if (pos) {
+      currentSet = currentSet.filter(w => w.partOfSpeech === pos);
     }
     currentSet = currentSet.slice(0, dailyWordCount);
   } else if (type === 'curriculum') {

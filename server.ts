@@ -9,7 +9,8 @@ const PORT = 3000;
 app.use(express.json());
 
 // Mount API routes
-app.use(apiRouter);
+app.use('/api', apiRouter);
+app.use(apiRouter); // Fallback for root-level legacy calls
 
 async function startServer() {
   // Vite middleware for development

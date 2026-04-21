@@ -31,7 +31,7 @@ export const Home: React.FC = () => {
   const hoursLeft = Math.ceil((cooldownMs - timeSinceComplete) / (60 * 60 * 1000));
 
   const standardReview = getStandardReviewWords();
-  const customUnmastered = getCustomUnmasteredWords().filter(w => !w.curriculumCategory && !w.testDate);
+  const practiceWords = allWords.filter(w => !masteredWords.includes(w.id) && !w.curriculumCategory && !w.testDate);
   const customReview = getCustomReviewWords();
   
   const [posFilter, setPosFilter] = React.useState<string>('all');
@@ -41,6 +41,11 @@ export const Home: React.FC = () => {
     verb: 'bg-rose-100 text-rose-700',
     adjective: 'bg-sky-100 text-sky-700',
     adverb: 'bg-purple-100 text-purple-700'
+  };
+
+  const getFilteredCount = (pos: string) => {
+    if (pos === 'all') return practiceWords.length;
+    return practiceWords.filter(w => w.partOfSpeech === pos).length;
   };
 
   const filteredDaily = posFilter === 'all' 
@@ -119,6 +124,21 @@ export const Home: React.FC = () => {
           </div>
         )}
 
+        {/* New Special Collection Module */}
+        <div className="relative group">
+          <button
+            onClick={() => navigate('/special-collection')}
+            className="w-full p-6 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-[2rem] shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 active:scale-95 flex flex-col items-center text-center space-y-2 border-4 border-white/20"
+          >
+            <div className="text-4xl">💎</div>
+            <h2 className="text-2xl font-black italic tracking-tighter">THE SPECIAL VAULT</h2>
+            <p className="text-indigo-100 text-xs font-bold uppercase tracking-widest leading-none">Cool • Tricky • Hard • Nouns</p>
+          </button>
+          <div className="absolute -top-2 -right-2 bg-rose-500 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-lg rotate-12 group-hover:rotate-0 transition-transform">
+            NEW!!
+          </div>
+        </div>
+
         {/* Daily Quest Section */}
         <div className="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-amber-100 space-y-4">
           <div className="flex justify-between items-center">
@@ -129,29 +149,36 @@ export const Home: React.FC = () => {
                   key={pos}
                   onClick={() => setPosFilter(pos)}
                   className={clsx(
-                    "px-2 py-1 rounded-lg text-[10px] font-black uppercase transition-all",
+                    "px-2 py-1 rounded-lg text-[10px] font-black uppercase transition-all flex items-center gap-1",
                     posFilter === pos 
                       ? (pos === 'all' ? 'bg-amber-500 text-white' : posColors[pos])
                       : 'bg-stone-50 text-stone-400 hover:bg-stone-100'
                   )}
                 >
-                  {pos === 'all' ? 'All' : pos.slice(0, 3)}
+                  <span>{pos === 'all' ? 'All' : pos.slice(0, 3)}</span>
+                  <span className="opacity-60 text-[8px]">({getFilteredCount(pos)})</span>
                 </button>
               ))}
             </div>
           </div>
           
-          {isLocked ? (
+          {isLocked && posFilter === 'all' ? (
             <div className="w-full py-4 bg-emerald-100 text-emerald-800 rounded-2xl text-xl font-bold text-center border-2 border-emerald-200">
-              🎉 Completed! Come back in {hoursLeft} hours.
+              🎉 Daily Walk Done! Come back in {hoursLeft} hours.
             </div>
           ) : (
             <button
-              onClick={() => navigate(`/learn?type=daily${posFilter !== 'all' ? `&pos=${posFilter}` : ''}`)}
-              disabled={filteredDaily.length === 0}
+              onClick={() => {
+                if (posFilter === 'all') {
+                  navigate(`/learn?type=daily`);
+                } else {
+                  navigate(`/learn?type=custom&filter=uncategorized&pos=${posFilter}`);
+                }
+              }}
+              disabled={getFilteredCount(posFilter) === 0}
               className="w-full py-4 bg-amber-500 text-white rounded-2xl text-xl font-bold hover:bg-amber-600 transition-all active:scale-95 shadow-md hover:shadow-lg hover:-translate-y-1 disabled:opacity-50"
             >
-              {filteredDaily.length === 0 ? 'No words in this category' : 'Ready, Set, Dig!'}
+              {getFilteredCount(posFilter) === 0 ? 'No words left!' : 'Ready, Set, Dig!'}
             </button>
           )}
           
@@ -166,7 +193,7 @@ export const Home: React.FC = () => {
 
         {/* Custom Words Section */}
         <div className="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-teal-100 space-y-4">
-          <h2 className="text-2xl font-bold text-stone-800">Fancy Tricks</h2>
+          <h2 className="text-2xl font-bold text-stone-800">Expert Mode</h2>
           
           <button
             onClick={() => navigate('/curriculum')}
@@ -176,16 +203,6 @@ export const Home: React.FC = () => {
           </button>
           
           <div className="border-t-2 border-teal-50 pt-2 space-y-3">
-            <p className="text-xs text-stone-400 font-bold uppercase tracking-wider px-2">The Odd Ones (Uncategorized)</p>
-            {customUnmastered.length > 0 && (
-              <button
-                onClick={() => navigate('/learn?type=custom&filter=uncategorized')}
-                className="w-full py-4 bg-teal-500 text-white rounded-2xl text-xl font-bold hover:bg-teal-600 transition-all active:scale-95 shadow-md hover:shadow-lg hover:-translate-y-1"
-              >
-                Ready, Set, Dig! ({customUnmastered.length})
-              </button>
-            )}
-
             {customReview.length > 0 && (
               <button
                 onClick={() => navigate('/review?type=custom')}

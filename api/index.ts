@@ -5,9 +5,9 @@ import cors from 'cors';
 
 dotenv.config();
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const router = express.Router();
+router.use(cors());
+router.use(express.json());
 
 // Standard prompt for word analysis
 const WORD_ANALYSIS_PROMPT = (word: string) => `Generate educational data for the English word '${word}'. It must be suitable for grades 2-6 (Lexile < 800L). 
@@ -27,27 +27,40 @@ STRICT CURRICULUM MAPPING RULES (ONLY pick one category and sub-rule if applicab
 4. Homophones:
    - Set 1 (Basic), Set 2 (Advanced), Set 3 (Master)
 
+5. Cool Words:
+   - Category Name: 'Cool'
+
+6. Non-Phonetic Words:
+   - Category Name: 'Tricky'
+
+7. Difficulty Words:
+   - Category Name: 'Difficulty'
+
+8. Nouns:
+   - Category Name: 'Nouns'
+
 MAPPING INSTRUCTIONS:
-- If the word matches a rule, set 'curriculumCategory' to the Category Name (Prefixes, Suffixes, Phonics, Homophones) and 'curriculumSub' to the EXACT rule name from the list above.
+- For Categories 1-4: Set 'curriculumCategory' to the Category Name and 'curriculumSub' to the EXACT rule name.
+- For Categories 5-8: Set 'curriculumCategory' to the Category Name and 'curriculumSub' to null.
 - Identify the 'partOfSpeech' correctly (noun, verb, adjective, adverb).
 
 SUMMA AI COLOR CODING SYSTEM for 'decoratedWord':
-1. [red]...[/red] -> Short Vowels (短母音). Usage: Basic short vowel sounds or irregular short sounds. e.g., br[red]ea[/red]th, h[red]e[/red]lp.
-2. [skyblue]...[/skyblue] -> Long Vowels (長母音/Vowel Teams). Usage: Vowel teams where two vowels make a long sound. e.g., l[skyblue]ea[/skyblue]ves, gr[skyblue]ea[/skyblue]t.
-3. [orange]...[/orange] -> Digraphs/Blends (二合字母). Usage: Two or more letters acting as a single sound. e.g., [orange]th[/orange]ick, [orange]sh[/orange]adow.
-4. [purple]...[/purple] -> R-controlled (R延伸母音). Usage: Vowels followed and controlled by 'R' (ar, er, ir, or, ur). e.g., sh[purple]ar[/purple]p, f[purple]er[/purple]n.
-5. [blue]...[/blue] -> Silent Letters (不發音字母). Rule: Letters written but not pronounced. e.g., leav[blue]e[/blue]s, [blue]k[/blue]night, clim[blue]b[/blue].
-6. [green]...[/green] -> Variant/Schwa (變音/中性音). Usage: Variant vowels, Schwa sounds, or highly irregular pronunciations. e.g., [green]o[/green]f, syst[green]e[/green]m.
+1. [red]...[/red] -> Short Vowels. Usage: Basic short vowel sounds or irregular short sounds. e.g., br[red]ea[/red]th, h[red]e[/red]lp.
+2. [skyblue]...[/skyblue] -> Long Vowels/Vowel Teams. Usage: Vowel teams where two vowels make a long sound. e.g., l[skyblue]ea[/skyblue]ves, gr[skyblue]ea[/skyblue]t.
+3. [orange]...[/orange] -> Digraphs/Blends. Usage: Two or more letters acting as a single sound. e.g., [orange]th[/orange]ick, [orange]sh[/orange]adow.
+4. [purple]...[/purple] -> R-controlled. Usage: Vowels followed and controlled by 'R' (ar, er, ir, or, ur). e.g., sh[purple]ar[/purple]p, f[purple]er[/purple]n.
+5. [blue]...[/blue] -> Silent Letters. Rule: Letters written but not pronounced. e.g., leav[blue]e[/blue]s, [blue]k[/blue]night, clim[blue]b[/blue].
+6. [green]...[/green] -> Variant/Schwa. Usage: Variant vowels, Schwa sounds, or highly irregular pronunciations. e.g., [green]o[/green]f, syst[green]e[/green]m.
 
 Return ONLY a JSON object that strictly adheres to the provided schema.`;
 
 // Health check route
-app.get(['/api/health', '/health'], (req, res) => {
-  res.json({ status: 'ok', environment: process.env.NODE_ENV });
+router.get(['/health', '/api/health'], (req, res) => {
+  res.json({ status: 'ok', environment: process.env.NODE_ENV, timestamp: new Date().toISOString() });
 });
 
-// API Route for Word Generation - Robust path matching
-app.post(['/api/generate-word', '/generate-word'], async (req, res) => {
+// API Route for Word Generation
+router.post(['/generate-word', '/api/generate-word'], async (req, res) => {
   try {
     const { word } = req.body;
     if (!word) {
@@ -71,7 +84,7 @@ app.post(['/api/generate-word', '/generate-word'], async (req, res) => {
     const ai = new GoogleGenAI({ apiKey });
     
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-1.5-flash",
       contents: WORD_ANALYSIS_PROMPT(word),
       config: {
         responseMimeType: "application/json",
@@ -97,10 +110,10 @@ app.post(['/api/generate-word', '/generate-word'], async (req, res) => {
             story: { type: Type.STRING },
             curriculumCategory: { 
               type: Type.STRING,
-              description: "One of: 'Prefixes', 'Suffixes', 'Phonics', 'Homophones', 'Exceptions', or null"
+              description: "One of the category names listed above"
             },
-            curriculumSub: { type: Type.STRING, description: "The specific rule name or null" },
-            decoratedWord: { type: Type.STRING, description: "The word with [color]letter[/color] tags (red: short vowels, blue: long, skyblue: vowel teams, orange: digraphs)" },
+            curriculumSub: { type: Type.STRING, description: "The specific rule name" },
+            decoratedWord: { type: Type.STRING, description: "The word with [color] tags" },
             phonicsRules: { 
               type: Type.ARRAY,
               items: { type: Type.STRING }
@@ -124,4 +137,9 @@ app.post(['/api/generate-word', '/generate-word'], async (req, res) => {
   }
 });
 
-export default app;
+// Diagnose 405: If it's a GET to generate-word, it's an error
+router.get(['/generate-word', '/api/generate-word'], (req, res) => {
+  res.status(405).json({ error: 'Method Not Allowed. Use POST instead of GET for word generation.' });
+});
+
+export default router;

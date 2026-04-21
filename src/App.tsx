@@ -14,6 +14,7 @@ import { ManageWords } from './pages/ManageWords';
 import { Settings } from './pages/Settings';
 import { PasswordGate } from './components/PasswordGate';
 import { CurriculumMap } from './pages/CurriculumMap';
+import { SpecialCollection } from './pages/SpecialCollection';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/learn" element={<Learn />} />
             <Route path="/review" element={<Review />} />
             <Route path="/curriculum" element={<CurriculumMap />} />
+            <Route path="/special-collection" element={<SpecialCollection />} />
             <Route path="/manage" element={<ManageWords />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
