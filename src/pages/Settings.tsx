@@ -3,7 +3,6 @@ import { useProgress } from '../store/progress';
 import { WordEntry } from '../data/words';
 import { Settings as SettingsIcon, Upload, RotateCcw, BarChart3, Trash2, CheckCircle2, AlertCircle, Circle, CheckCircle } from 'lucide-react';
 import clsx from 'clsx';
-import { generateWordData } from '../services/geminiService';
 
 export const Settings: React.FC = () => {
   const { 
@@ -54,7 +53,18 @@ export const Settings: React.FC = () => {
 
     for (const word of wordsToUpload) {
       try {
-        const data = await generateWordData(word);
+        const response = await fetch('/api/generate-word', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ word: word })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
         const newWord: WordEntry = {
           id: `custom-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           word: word.toLowerCase(),

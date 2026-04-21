@@ -20,12 +20,12 @@ export const PhonicsWord: React.FC<Props> = ({ decoratedWord, className = "" }) 
       }
     } else if (part) {
       const colorMap: Record<string, string> = {
-        red: 'text-red-500',
-        blue: 'text-blue-500',
-        skyblue: 'text-sky-400',
-        purple: 'text-purple-500',
-        green: 'text-emerald-500',
-        orange: 'text-orange-500',
+        red: 'text-rose-500 font-bold',
+        blue: 'text-indigo-400 opacity-60', // Silent letters: slightly faded
+        skyblue: 'text-sky-500 font-bold',
+        purple: 'text-purple-500 font-bold',
+        green: 'text-emerald-500 font-bold',
+        orange: 'text-orange-500 font-bold',
       };
       
       const colorClass = colorMap[currentColor] || 'text-stone-800';

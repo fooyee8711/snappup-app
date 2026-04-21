@@ -105,11 +105,11 @@ export const BuildWord: React.FC<Props> = ({ word, onNext }) => {
 
   const getColorClass = (color?: string) => {
     const colorMap: Record<string, string> = {
-      red: 'text-red-500',
-      blue: 'text-blue-500',
-      skyblue: 'text-sky-400',
+      red: 'text-rose-600',
+      blue: 'text-indigo-400 opacity-70',
+      skyblue: 'text-sky-500',
       purple: 'text-purple-500',
-      green: 'text-emerald-500',
+      green: 'text-emerald-600',
       orange: 'text-orange-500',
     };
     return color ? colorMap[color] : 'text-stone-800';
@@ -118,14 +118,14 @@ export const BuildWord: React.FC<Props> = ({ word, onNext }) => {
   const getBgClass = (type: string, color?: string) => {
     if (color) {
       const bgMap: Record<string, string> = {
-        red: 'bg-red-50',
-        blue: 'bg-blue-50',
-        skyblue: 'bg-sky-50',
-        purple: 'bg-purple-50',
-        green: 'bg-emerald-50',
-        orange: 'bg-orange-50',
+        red: 'bg-rose-50 border-rose-100',
+        blue: 'bg-indigo-50 border-indigo-100',
+        skyblue: 'bg-sky-50 border-sky-100',
+        purple: 'bg-purple-50 border-purple-100',
+        green: 'bg-emerald-50 border-emerald-100',
+        orange: 'bg-orange-50 border-orange-100',
       };
-      return bgMap[color] || 'bg-stone-50';
+      return bgMap[color] || 'bg-stone-50 border-stone-100';
     }
     
     switch (type) {

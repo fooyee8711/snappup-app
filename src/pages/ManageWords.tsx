@@ -2,7 +2,6 @@ import React, { useState, useRef, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProgress } from '../store/progress';
 import { WordEntry } from '../data/words';
-import { generateWordData } from '../services/geminiService';
 import { Trash2, CheckCircle, Circle, Search } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -153,7 +152,18 @@ export const ManageWords: React.FC = () => {
 
       while (attempts < maxAttempts && !success) {
         try {
-          const data = await generateWordData(targetWord);
+          const response = await fetch('/api/generate-word', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ word: targetWord })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
 
           const newWord: WordEntry = {
             id: `custom-${Date.now()}-${i}`,

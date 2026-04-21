@@ -1,12 +1,15 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import { GoogleGenAI } from '@google/genai';
 import path from 'path';
+import apiRouter from './api/index';
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+
+// Mount API routes
+app.use(apiRouter);
 
 async function startServer() {
   // Vite middleware for development
