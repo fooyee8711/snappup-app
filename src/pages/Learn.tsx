@@ -77,19 +77,22 @@ export const Learn: React.FC = () => {
       const savedIndex = currentSet.findIndex(w => w.id === lastSession.wordId);
       if (savedIndex !== -1) {
         setWordIndex(savedIndex);
+        setLoop(lastSession.loop || 1);
+        setStep((lastSession.step as Step) || (mode === 'review' ? 'fill' : 'target'));
+        setIsTesting(lastSession.isTesting || false);
       }
     }
   }, []);
 
-  // Update session on word change
+  // Update session on changes
   const currentWordId = currentSet[wordIndex]?.id;
   const sessionPath = location.pathname + location.search;
 
   useEffect(() => {
     if (currentWordId) {
-      updateLastSession(sessionPath, currentWordId);
+      updateLastSession(sessionPath, currentWordId, loop, step, isTesting);
     }
-  }, [wordIndex, currentWordId, sessionPath, updateLastSession]);
+  }, [wordIndex, currentWordId, sessionPath, updateLastSession, loop, step, isTesting]);
 
   if (currentSet.length === 0) {
     return (

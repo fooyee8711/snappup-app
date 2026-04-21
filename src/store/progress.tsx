@@ -32,8 +32,8 @@ interface ProgressContextType {
   addCustomWord: (word: WordEntry) => void;
   dailyCompletedAt: number | null;
   markDailyComplete: () => void;
-  lastSession: { path: string; wordId: string; timestamp: number } | null;
-  updateLastSession: (path: string, wordId: string) => void;
+  lastSession: { path: string; wordId: string; loop: number; step: string; isTesting: boolean; timestamp: number } | null;
+  updateLastSession: (path: string, wordId: string, loop: number, step: string, isTesting: boolean) => void;
   clearLastSession: () => void;
 }
 
@@ -50,7 +50,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [dailyStats, setDailyStats] = useState<Record<string, number>>({});
   const [dailyWords, setDailyWords] = useState<string[]>([]);
   const [dailyCompletedAt, setDailyCompletedAt] = useState<number | null>(null);
-  const [lastSession, setLastSession] = useState<{ path: string; wordId: string; timestamp: number } | null>(null);
+  const [lastSession, setLastSession] = useState<{ path: string; wordId: string; loop: number; step: string; isTesting: boolean; timestamp: number } | null>(null);
 
   // Sync utilities
   const syncProfile = useCallback(async (updates: Partial<any>) => {
@@ -188,8 +188,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [lastSession, loading]);
 
-  const updateLastSession = useCallback((path: string, wordId: string) => {
-    const session = { path, wordId, timestamp: Date.now() };
+  const updateLastSession = useCallback((path: string, wordId: string, loop: number, step: string, isTesting: boolean) => {
+    const session = { path, wordId, loop, step, isTesting, timestamp: Date.now() };
     setLastSession(session);
     syncProfile({ lastSession: session });
   }, [syncProfile]);

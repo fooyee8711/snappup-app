@@ -1,7 +1,12 @@
 import express from 'express';
 import { GoogleGenAI, Type } from '@google/genai';
+import dotenv from 'dotenv';
+import cors from 'cors';
+
+dotenv.config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Standard prompt for word analysis
@@ -36,8 +41,13 @@ SUMMA AI COLOR CODING SYSTEM for 'decoratedWord':
 
 Return ONLY a JSON object that strictly adheres to the provided schema.`;
 
-// API Route for Word Generation
-app.post('/api/generate-word', async (req, res) => {
+// Health check route
+app.get(['/api/health', '/health'], (req, res) => {
+  res.json({ status: 'ok', environment: process.env.NODE_ENV });
+});
+
+// API Route for Word Generation - Robust path matching
+app.post(['/api/generate-word', '/generate-word'], async (req, res) => {
   try {
     const { word } = req.body;
     if (!word) {

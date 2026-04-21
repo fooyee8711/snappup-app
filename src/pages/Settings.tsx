@@ -60,8 +60,15 @@ export const Settings: React.FC = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+          } else {
+            const text = await response.text();
+            console.error("API returned non-JSON response:", text.substring(0, 200));
+            throw new Error(`Server Error: Received ${response.status}. Check API config.`);
+          }
         }
 
         const data = await response.json();
