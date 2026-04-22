@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { WordEntry } from '../../data/words';
 import clsx from 'clsx';
+import { Volume2 } from 'lucide-react';
 
 interface Props {
   word: WordEntry;
@@ -12,6 +13,13 @@ export const BuildWord: React.FC<Props> = ({ word, onNext }) => {
   const [availableParts, setAvailableParts] = useState<{ id: string; text: string; type: string; color?: string }[]>([]);
   const [isCorrect, setIsCorrect] = useState(false);
   const [error, setError] = useState(false);
+
+  const playAudio = () => {
+    const utterance = new SpeechSynthesisUtterance(word.word);
+    utterance.lang = 'en-GB';
+    utterance.rate = 0.9;
+    window.speechSynthesis.speak(utterance);
+  };
 
   // Helper to parse decorated word into chunks with color info
   const getPhonicsChunks = (decorated: string) => {
@@ -62,6 +70,7 @@ export const BuildWord: React.FC<Props> = ({ word, onNext }) => {
 
     // Shuffle
     setAvailableParts(parts.sort(() => Math.random() - 0.5));
+    playAudio();
   }, [word]);
 
   const expectedLength = availableParts.filter(p => p.type !== 'distractor').length;
@@ -138,9 +147,17 @@ export const BuildWord: React.FC<Props> = ({ word, onNext }) => {
 
   return (
     <div className="flex-1 flex flex-col items-center space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="text-center space-y-2 mt-8">
+      <div className="text-center space-y-4 mt-8">
         <h3 className="text-3xl font-black text-stone-800 tracking-tight">Build the word</h3>
         <p className="text-stone-500 font-bold text-lg">Tap the parts in the correct order</p>
+        
+        <button 
+          type="button"
+          onClick={playAudio}
+          className="mx-auto flex items-center justify-center gap-2 px-6 py-2 bg-stone-100 text-stone-700 rounded-full hover:bg-stone-200 transition-all active:scale-95 border-2 border-stone-200 font-black text-sm"
+        >
+          <Volume2 size={20} /> Listen
+        </button>
       </div>
 
       <div className="flex gap-2 min-h-[5rem] items-center justify-center w-full bg-white rounded-3xl p-6 border-4 border-dashed border-amber-200">

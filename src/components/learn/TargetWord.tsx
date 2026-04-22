@@ -13,8 +13,13 @@ export const TargetWord: React.FC<Props> = ({ word, onNext }) => {
   const playAudio = () => {
     const utterance = new SpeechSynthesisUtterance(word.word);
     utterance.lang = 'en-GB';
+    utterance.rate = 0.9;
     window.speechSynthesis.speak(utterance);
   };
+
+  React.useEffect(() => {
+    playAudio();
+  }, [word]);
 
   return (
     <div className="flex-1 flex flex-col justify-center items-center space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">

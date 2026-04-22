@@ -30,9 +30,17 @@ export const Dictation: React.FC<Props> = ({ word, onNext }) => {
     e.preventDefault();
     if (input.toLowerCase() === word.word.toLowerCase()) {
       setIsCorrect(true);
+      // Play success sound
+      const audio = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_06d962776c.mp3');
+      audio.volume = 0.5;
+      audio.play().catch(e => console.log('Audio play failed:', e));
       setTimeout(onNext, 1500);
     } else {
       setShowHint(true);
+      // Play error sound
+      const audio = new Audio('https://cdn.pixabay.com/audio/2022/03/24/audio_730240d426.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(e => console.log('Audio play failed:', e));
       playAudio();
       setInput('');
     }

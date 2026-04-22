@@ -18,6 +18,12 @@ export const Praise: React.FC<Props> = ({ onNext }) => {
 
   useEffect(() => {
     setPraise(praises[Math.floor(Math.random() * praises.length)]);
+    
+    // Play praise sound
+    const audio = new Audio('https://cdn.pixabay.com/audio/2021/08/04/audio_12b0aedff4.mp3');
+    audio.volume = 0.4;
+    audio.play().catch(e => console.log('Audio play failed:', e));
+
     const timer = setTimeout(onNext, 2000);
     return () => clearTimeout(timer);
   }, [onNext]);
