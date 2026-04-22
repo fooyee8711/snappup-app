@@ -18,7 +18,7 @@ export interface WordEntry {
   story: string;
   relatedWords: RelatedWord[];
   category: string;
-  curriculumCategory?: 'Prefixes' | 'Suffixes' | 'Phonics' | 'Homophones' | 'Exceptions';
+  curriculumCategory?: 'Prefixes' | 'Suffixes' | 'Phonics' | 'Homophones' | 'Exceptions' | 'Cool' | 'Tricky' | 'Difficulty' | 'Nouns';
   curriculumSub?: string;
   level?: string;
   bookSentence?: string;
@@ -6618,5 +6618,109 @@ export const words: WordEntry[] = [
     category: "Homophones",
     curriculumCategory: "Homophones",
     curriculumSub: "Set 1"
+  },
+  {
+    id: "cool-1",
+    word: "thunderbolt",
+    morphology: { root: "thunder", suffix: "bolt" },
+    meaning: "A bright flash of lightning and high sound of thunder.",
+    exampleSentence: "A massive thunderbolt lit up the dark sky.",
+    story: "BOOM! A **thunderbolt** crashed near the old oak tree. The dog hid under the bed, but our hero dog, SnapPup, stood brave against the mighty **thunderbolt**!",
+    relatedWords: [{ word: "thunder", meaning: "The sound of lightning" }],
+    category: "Nature",
+    curriculumCategory: "Cool",
+    decoratedWord: "[orange]th[/orange]und[purple]er[/purple]b[orange]o[/orange]lt",
+    partOfSpeech: "noun"
+  },
+  {
+    id: "cool-2",
+    word: "skyscraper",
+    morphology: { root: "sky", suffix: "scraper" },
+    meaning: "A very tall building in a city.",
+    exampleSentence: "The skyscraper was so tall it touched the clouds.",
+    story: "Living in the city means seeing every **skyscraper** reach for the stars. From the top of the tallest **skyscraper**, the cars look like tiny ants!",
+    relatedWords: [{ word: "scrape", meaning: "To rub against" }],
+    category: "City",
+    curriculumCategory: "Cool",
+    decoratedWord: "skyscrap[purple]er[/purple]",
+    partOfSpeech: "noun"
+  },
+  {
+    id: "tricky-1",
+    word: "island",
+    morphology: { root: "island" },
+    meaning: "A piece of land surrounded by water.",
+    exampleSentence: "We took a boat to the tropical island.",
+    story: "Deep in the blue sea sits a tiny **island**. Even though there is an 's' in **island**, we don't say it! It's a silent secret of the **island**.",
+    relatedWords: [{ word: "isle", meaning: "A small island" }],
+    category: "Geography",
+    curriculumCategory: "Tricky",
+    decoratedWord: "i[blue]s[/blue]land",
+    partOfSpeech: "noun"
+  },
+  {
+    id: "tricky-2",
+    word: "choir",
+    morphology: { root: "choir" },
+    meaning: "A group of people who sing together.",
+    exampleSentence: "Our school choir sang a beautiful song.",
+    story: "The **choir** practiced every Monday. In the word **choir**, the 'ch' sounds like a 'k'! The **choir** sounded like angels in the large hall.",
+    relatedWords: [{ word: "chorus", meaning: "A part of a song" }],
+    category: "Music",
+    curriculumCategory: "Tricky",
+    decoratedWord: "[orange]ch[/orange]oir",
+    partOfSpeech: "noun"
+  },
+  {
+    id: "diff-1",
+    word: "necessary",
+    morphology: { root: "necess", suffix: "ary" },
+    meaning: "Something that you must have or do.",
+    exampleSentence: "Food and water are necessary for life.",
+    story: "Is it **necessary** to pack so much? Mom said it is **necessary** to bring a jacket because it might get cold. Sometimes, hard work is **necessary** for success.",
+    relatedWords: [{ word: "necessity", meaning: "A requirement" }],
+    category: "Philosophy",
+    curriculumCategory: "Difficulty",
+    decoratedWord: "nece[blue]ss[/blue][green]a[/green]ry",
+    partOfSpeech: "adjective"
+  },
+  {
+    id: "diff-2",
+    word: "giraffe",
+    morphology: { root: "giraffe" },
+    meaning: "A tall African animal with a very long neck.",
+    exampleSentence: "The giraffe ate leaves from the tall tree.",
+    story: "The **giraffe** is the tallest animal in the world. With its long neck, the **giraffe** can see everything! This **giraffe** has a silent 'e' at the very end.",
+    relatedWords: [],
+    category: "Animals",
+    curriculumCategory: "Difficulty",
+    decoratedWord: "giraf[blue]fe[/blue]",
+    partOfSpeech: "noun"
+  },
+  {
+    id: "noun-1",
+    word: "cheetah",
+    morphology: { root: "cheetah" },
+    meaning: "A large cat that can run very fast.",
+    exampleSentence: "The cheetah is the fastest land animal.",
+    story: "Watch out! The **cheetah** is on the hunt. With its spots and speed, the **cheetah** is a master of the grass. The **cheetah** can run faster than a car!",
+    relatedWords: [],
+    category: "Animals",
+    curriculumCategory: "Nouns",
+    decoratedWord: "[orange]ch[/orange]eetah",
+    partOfSpeech: "noun"
+  },
+  {
+    id: "noun-2",
+    word: "galaxy",
+    morphology: { root: "galaxy" },
+    meaning: "A huge collection of gas, dust, and billions of stars.",
+    exampleSentence: "We live in the Milky Way galaxy.",
+    story: "Look up at the night sky. Beyond the moon lies our entire **galaxy**. There are billions of stars in just one **galaxy**, and we are part of it!",
+    relatedWords: [{ word: "galactic", meaning: "Relating to a galaxy" }],
+    category: "Space",
+    curriculumCategory: "Nouns",
+    decoratedWord: "g[green]a[/green]laxy",
+    partOfSpeech: "noun"
   }
 ];

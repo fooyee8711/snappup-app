@@ -55,12 +55,12 @@ SUMMA AI COLOR CODING SYSTEM for 'decoratedWord':
 Return ONLY a JSON object that strictly adheres to the provided schema.`;
 
 // Health check route
-router.get(['/health', '/api/health'], (req, res) => {
+router.get('/health', (req, res) => {
   res.json({ status: 'ok', environment: process.env.NODE_ENV, timestamp: new Date().toISOString() });
 });
 
 // API Route for Word Generation
-router.post(['/generate-word', '/api/generate-word'], async (req, res) => {
+router.post('/generate-word', async (req, res) => {
   try {
     const { word } = req.body;
     if (!word) {
@@ -135,11 +135,6 @@ router.post(['/generate-word', '/api/generate-word'], async (req, res) => {
       error: error instanceof Error ? error.message : 'Failed to generate word data' 
     });
   }
-});
-
-// Diagnose 405: If it's a GET to generate-word, it's an error
-router.get(['/generate-word', '/api/generate-word'], (req, res) => {
-  res.status(405).json({ error: 'Method Not Allowed. Use POST instead of GET for word generation.' });
 });
 
 export default router;

@@ -10,7 +10,7 @@ app.use(express.json());
 
 // Mount API routes
 app.use('/api', apiRouter);
-app.use(apiRouter); // Fallback for root-level legacy calls
+// No more fallback - let's be explicit with /api
 
 async function startServer() {
   // Vite middleware for development
