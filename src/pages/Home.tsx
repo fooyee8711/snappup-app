@@ -193,32 +193,34 @@ export const Home: React.FC = () => {
 
         {/* Custom Words Section */}
         <div className="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-teal-100 space-y-4">
-          <h2 className="text-2xl font-bold text-stone-800">Expert Mode</h2>
-          
-          <button
-            onClick={() => navigate('/curriculum')}
-            className="w-full py-4 bg-purple-500 text-white rounded-2xl text-xl font-bold hover:bg-purple-600 transition-all active:scale-95 shadow-md hover:shadow-lg hover:-translate-y-1"
-          >
-            🦴 Expert Training
-          </button>
-          
-          <div className="border-t-2 border-teal-50 pt-2 space-y-3">
-            {customReview.length > 0 && (
-              <button
-                onClick={() => navigate('/review?type=custom')}
-                className="w-full py-4 bg-teal-100 text-teal-800 rounded-2xl text-xl font-bold hover:bg-teal-200 transition-all active:scale-95 shadow-sm hover:shadow-md hover:-translate-y-1"
-              >
-                Bone Collection ({customReview.length})
-              </button>
-            )}
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-stone-800">Expert Mode</h2>
+            <button
+              onClick={() => navigate('/manage')}
+              className="px-4 py-2 bg-teal-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-teal-600 transition-all active:scale-95 shadow-sm"
+            >
+              + Teach New
+            </button>
           </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => navigate('/curriculum')}
+              className="py-6 bg-purple-500 text-white rounded-2xl text-base font-black hover:bg-purple-600 transition-all active:scale-95 shadow-md hover:shadow-lg flex flex-col items-center justify-center space-y-1"
+            >
+              <span className="text-2xl">🦴</span>
+              <span>Training</span>
+            </button>
 
-          <button
-            onClick={() => navigate('/manage')}
-            className="w-full py-4 bg-white text-teal-600 border-4 border-teal-100 rounded-2xl text-xl font-bold hover:bg-teal-50 transition-all active:scale-95 shadow-sm hover:shadow-md hover:-translate-y-1"
-          >
-            + Teach a New Trick
-          </button>
+            <button
+              onClick={() => navigate('/review?type=custom')}
+              disabled={customReview.length === 0}
+              className="py-6 bg-teal-100 text-teal-800 rounded-2xl text-base font-black hover:bg-teal-200 transition-all active:scale-95 border-2 border-teal-200 disabled:opacity-50 flex flex-col items-center justify-center space-y-1"
+            >
+              <span className="text-2xl">🦴</span>
+              <span>Review ({customReview.length})</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
