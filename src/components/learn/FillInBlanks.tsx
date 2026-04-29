@@ -23,7 +23,7 @@ export const FillInBlanks: React.FC<Props> = ({ word, onNext }) => {
   };
 
   useEffect(() => {
-    playAudio();
+    // playAudio(); // Removed automatic playback as per user request
   }, [word]);
 
   const sentence = word.bookSentence || word.exampleSentence || word.story;
