@@ -195,12 +195,6 @@ export const Home: React.FC = () => {
         <div className="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-teal-100 space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-bold text-stone-800">Expert Mode</h2>
-            <button
-              onClick={() => navigate('/manage')}
-              className="px-4 py-2 bg-teal-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-teal-600 transition-all active:scale-95 shadow-sm"
-            >
-              + Teach New
-            </button>
           </div>
           
           <div className="grid grid-cols-2 gap-3">
