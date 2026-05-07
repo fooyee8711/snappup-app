@@ -18,10 +18,29 @@ export const Home: React.FC = () => {
     lastSession
   } = useProgress();
 
+  const [showArchive, setShowArchive] = React.useState(false);
+  
   const allWords = getAllWords();
   const lastWord = lastSession ? allWords.find(w => w.id === lastSession.wordId) : null;
   const dictationDates = Array.from(new Set(allWords.map(w => w.testDate).filter(Boolean))) as string[];
-  dictationDates.sort();
+  dictationDates.sort().reverse(); // Show newest first
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  const activeDictations = dictationDates.filter(date => {
+    const isUpcoming = date >= todayStr;
+    const wordsForDate = getWordsByDate(date);
+    const masteredCount = wordsForDate.filter(w => masteredWords.includes(w.id)).length;
+    const isIncomplete = masteredCount < wordsForDate.length;
+    return isUpcoming || isIncomplete;
+  });
+
+  // Limit visible to top 2, move rest to archive
+  const visibleActive = activeDictations.slice(0, 2);
+  const hiddenActive = activeDictations.slice(2);
+  const archivedDictations = [...hiddenActive, ...dictationDates.filter(date => !activeDictations.includes(date))];
+  // Sort archived by date descending
+  archivedDictations.sort().reverse();
 
   const isDailyComplete = dailyWords.length > 0 && dailyWords.every(id => masteredWords.includes(id));
   
@@ -83,43 +102,124 @@ export const Home: React.FC = () => {
         )}
         {/* School Dictation Section */}
         {dictationDates.length > 0 && (
-          <div className="bg-white p-6 rounded-[2rem] shadow-sm border-2 border-indigo-100 space-y-4">
-            <h2 className="text-2xl font-bold text-stone-800">🏫 School Dictation</h2>
-            <div className="grid gap-3">
-              {dictationDates.map(date => {
+          <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border-2 border-indigo-100 space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-black text-stone-800 flex items-center gap-2">
+                <span className="text-3xl">🏫</span> School Dictations
+              </h2>
+              <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
+                {activeDictations.length} Active
+              </span>
+            </div>
+            
+            <div className="grid gap-6">
+              {/* Active Missions */}
+              {visibleActive.map(date => {
                 const wordsForDate = getWordsByDate(date);
                 const masteredForDate = wordsForDate.filter(w => masteredWords.includes(w.id)).length;
                 const progressPercent = (masteredForDate / wordsForDate.length) * 100;
+                const ghostProgress = Math.min(100, progressPercent + (masteredForDate > 0 ? 15 : 0));
 
+                const isUpcoming = date >= todayStr;
                 return (
-                  <div key={date} className="relative group">
+                  <div key={date} className="group flex flex-col gap-2">
                     <button
                       onClick={() => navigate(`/learn?type=date&date=${date}`)}
-                      className="w-full text-left p-4 bg-indigo-50 border-2 border-indigo-100 rounded-2xl hover:border-indigo-400 hover:shadow-md transition-all active:scale-[0.98]"
+                      className="w-full text-left p-5 bg-indigo-50/50 border-2 border-indigo-100 rounded-[2rem] hover:border-indigo-400 hover:bg-white hover:shadow-xl transition-all active:scale-[0.98] relative overflow-hidden"
                     >
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-black text-indigo-700 text-lg">{date}</span>
-                        <span className="font-bold text-indigo-400">{masteredForDate}/{wordsForDate.length}</span>
+                      <div className="flex justify-between items-end mb-3 relative z-10">
+                        <div className="flex flex-col">
+                          <span className="font-black text-indigo-900 text-xl tracking-tight leading-none">{date}</span>
+                          <span className="text-indigo-400 text-[10px] font-black uppercase mt-1 tracking-widest">
+                            {isUpcoming ? '🚀 NEXT TARGET' : '🔄 FINISH UP'} • {wordsForDate.length} Words
+                          </span>
+                        </div>
+                        <div className="text-right">
+                          <span className="font-black text-indigo-700 text-2xl">{masteredForDate}</span>
+                          <span className="text-indigo-300 font-bold text-sm">/{wordsForDate.length}</span>
+                        </div>
                       </div>
-                      <div className="w-full bg-indigo-100 h-2 rounded-full overflow-hidden">
+
+                      <div className="relative h-6 w-full bg-indigo-100/50 rounded-full p-1 overflow-hidden border border-indigo-100 shadow-inner">
                         <div 
-                          className="bg-indigo-500 h-full transition-all duration-500" 
+                          className="absolute h-full border-r-2 border-indigo-300 border-dashed z-20 opacity-50"
+                          style={{ left: `${ghostProgress}%` }}
+                        >
+                          <div className="absolute -top-1 -right-3 text-[10px] opacity-40 grayscale font-black text-indigo-500 whitespace-nowrap rotate-12">
+                            👻 GHOST
+                          </div>
+                        </div>
+
+                        <div 
+                          className="h-full bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-full transition-all duration-1000 relative"
                           style={{ width: `${progressPercent}%` }}
-                        />
+                        >
+                          <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 bg-white rounded-full p-0.5 shadow-md border-2 border-indigo-500 z-30">
+                            <span className="text-xs">🐶</span>
+                          </div>
+                        </div>
                       </div>
+
+                      {progressPercent >= ghostProgress && progressPercent > 0 && (
+                        <div className="mt-2 text-[10px] font-black text-rose-500 italic animate-pulse flex items-center gap-1 justify-center">
+                          🔥 OVERTAKING THE GHOST DOG!
+                        </div>
+                      )}
                     </button>
                     
                     {masteredForDate > 0 && (
-                      <button
-                        onClick={() => navigate(`/learn?type=date&date=${date}&mode=review`)}
-                        className="mt-2 w-full py-3 bg-white text-indigo-600 border-2 border-indigo-100 rounded-xl text-sm font-black hover:bg-indigo-50 hover:border-indigo-400 transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle size={16} /> Review Mastered (Dictation & Fill)
-                      </button>
+                      <div className="grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => navigate(`/learn?type=date&date=${date}&mode=review`)}
+                          className="flex-1 py-3 bg-white text-indigo-600 border-2 border-indigo-100 rounded-2xl text-[10px] font-black hover:bg-indigo-50 hover:border-indigo-400 transition-all active:scale-[0.98] shadow-sm flex items-center justify-center gap-2"
+                        >
+                          <span className="text-sm">🦴</span> REVIEW ALL
+                        </button>
+                        <button
+                          onClick={() => navigate(`/learn?type=date&date=${date}&mode=test`)}
+                          className="flex-1 py-3 bg-indigo-600 text-white border-2 border-indigo-600 rounded-2xl text-[10px] font-black hover:bg-indigo-700 transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2"
+                        >
+                          <span className="text-sm">⚡</span> MOCK TEST
+                        </button>
+                      </div>
                     )}
                   </div>
                 );
               })}
+
+              {/* Archived Sections */}
+              {archivedDictations.length > 0 && (
+                <div className="pt-4 border-t-2 border-indigo-50 border-dashed">
+                  <button
+                    onClick={() => setShowArchive(!showArchive)}
+                    className="w-full py-4 bg-indigo-50/30 text-indigo-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-indigo-600 hover:bg-indigo-50 transition-all flex items-center justify-center gap-2"
+                  >
+                    {showArchive ? 'Close Archive' : `View Archive (${archivedDictations.length})`}
+                    <span className={clsx("transition-transform duration-300", showArchive && "rotate-180")}>▼</span>
+                  </button>
+
+                  {showArchive && (
+                    <div className="grid gap-3 mt-4 animate-in slide-in-from-top-2 duration-300">
+                      {archivedDictations.map(date => {
+                        const wordsForDate = getWordsByDate(date);
+                        return (
+                          <button
+                            key={date}
+                            onClick={() => navigate(`/learn?type=date&date=${date}`)}
+                            className="w-full flex items-center justify-between p-4 bg-stone-50 border-2 border-stone-100 rounded-2xl grayscale hover:grayscale-0 hover:border-indigo-200 transition-all text-left"
+                          >
+                            <div>
+                              <span className="font-black text-stone-600">{date}</span>
+                              <span className="ml-2 text-[8px] font-black text-stone-400 uppercase tracking-widest">MASTERED! 🏆</span>
+                            </div>
+                            <span className="text-stone-300">➜</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         )}
